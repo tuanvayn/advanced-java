@@ -1,27 +1,27 @@
-# 什么是微服务？微服务之间是如何独立通讯的？
+# What are microservices? How do microservices communicate independently of each other?
 
-## 什么是微服务
+## What are microservices
 
--   微服务架构是一个分布式系统，按照业务进行划分成为不同的服务单元，解决单体系统性能等不足。
--   微服务是一种架构风格，一个大型软件应用由多个服务单元组成。系统中的服务单元可以单独部署，各个服务单元之间是松耦合的。
+-   Microservice architecture is a distributed system, which is divided into different service units according to business to solve the shortcomings of single system performance.
+-   Microservices is an architectural style, where a large software application consists of multiple service units. The service units in the system can be deployed separately, and the service units are loosely coupled to each other.
 
-> 微服务概念起源：[Microservices](https://martinfowler.com/articles/microservices.html)
+> The origin of the microservices concept：[Microservices](https://martinfowler.com/articles/microservices.html)
 
-## 微服务之间是如何独立通讯的
+## How microservices communicate independently of each other
 
-### 同步
+### synchronous
 
-#### REST HTTP 协议
+#### REST HTTP agreement
 
-REST 请求在微服务中是最为常用的一种通讯方式，它依赖于 HTTP\HTTPS 协议。RESTFUL 的特点是：
+REST requests are one of the most commonly used means of communication in microservices and rely on the HTTP\HTTPS protocol. RESTFUL FEATURES ARE:
 
-1. 每一个 URI 代表 1 种资源
-2. 客户端使用 GET、POST、PUT、DELETE 4 个表示操作方式的动词对服务端资源进行操作：GET 用来获取资源，POST 用来新建资源（也可以用于更新资源），PUT 用来更新资源，DELETE 用来删除资源
-3. 通过操作资源的表现形式来操作资源
-4. 资源的表现形式是 XML 或者 HTML
-5. 客户端与服务端之间的交互在请求之间是无状态的,从客户端到服务端的每个请求都必须包含理解请求所必需的信息
+1. Each URI represents 1 resource
+2. The client uses GET, POST, PUT, DELETE 4 verbs that indicate the operation mode to operate on server-side resources: GET is used to obtain resources, POST is used to create new resources (can also be used to update resources), PUT is used to update resources, and DELETE is used to delete resources
+3. Manipulate resources by manipulating their representations
+4. Resources are represented in XML or HTML
+5. The interaction between the client and the server is stateless between requests, and each request from the client to the server must contain the information necessary to understand the request
 
-举个例子，有一个服务方提供了如下接口：
+For example, a server provides the following interface:
 
 ```java
 @RestController
@@ -34,7 +34,7 @@ public class RestControllerDemo {
 }
 ```
 
-另外一个服务需要去调用该接口，调用方只需要根据 API 文档发送请求即可获取返回结果。
+Another service needs to call the interface, and the caller only needs to send a request according to the API document to get the return result.
 
 ```java
 @RestController
@@ -51,26 +51,26 @@ public class RestDemo{
 }
 ```
 
-通过这样的方式可以实现服务之间的通讯。
+In this way, communication between services can be achieved.
 
-#### RPC TCP 协议
+#### RPC TCP protocol
 
-RPC(Remote Procedure Call)远程过程调用，简单的理解是一个节点请求另一个节点提供的服务。它的工作流程是这样的：
+RPC (Remote Procedure Call) remote procedure call, simply understood as a node requesting a service provided by another node. Its workflow is like this
 
-1. 执行客户端调用语句，传送参数
-2. 调用本地系统发送网络消息
-3. 消息传送到远程主机
-4. 服务器得到消息并取得参数
-5. 根据调用请求以及参数执行远程过程（服务）
-6. 执行过程完毕，将结果返回服务器句柄
-7. 服务器句柄返回结果，调用远程主机的系统网络服务发送结果
-8. 消息传回本地主机
-9. 客户端句柄由本地主机的网络服务接收消息
-10. 客户端接收到调用语句返回的结果数据
+1. Execute the client call statement and pass parameters
+2. Call the local system to send network messages
+3. The message is delivered to the remote host
+4. The server gets the message and gets the parameters
+5. Execute remote procedures (services) based on invocation requests and parameters
+6. When the execution process is complete, the result is returned to the server handle
+7. The server handle returns the result, and the remote host's system network service is called to send the result
+8. The message is passed back to localhost
+9. The client handle receives messages by the local host's network service
+10. The client receives the result data returned by the invocation statement
 
-举个例子。
+Take an example.
 
-首先需要一个服务端：
+First of all, you need a server：
 
 ```java
 import java.io.IOException;
@@ -85,7 +85,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * RPC 服务端用来注册远程方法的接口和实现类
+ * RPC The interface and implementation class used by the server to register remote methods
  */
 public class RPCServer {
     private static ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -93,7 +93,7 @@ public class RPCServer {
     private static final ConcurrentHashMap<String, Class> serviceRegister = new ConcurrentHashMap<>();
 
     /**
-     * 注册方法
+     * Register the method
      * @param service
      * @param impl
      */
@@ -102,7 +102,7 @@ public class RPCServer {
     }
 
     /**
-     * 启动方法
+     * Start method
      * @param port
      */
     public void start(int port) {
@@ -110,7 +110,7 @@ public class RPCServer {
         try {
             socket = new ServerSocket();
             socket.bind(new InetSocketAddress(port));
-            System.out.println("服务启动");
+            System.out.println("Service starts");
             System.out.println(serviceRegister);
             while (true) {
                 executor.execute(new Task(socket.accept()));
@@ -141,14 +141,14 @@ public class RPCServer {
             ObjectOutputStream output = null;
             try {
                 input = new ObjectInputStream(client.getInputStream());
-                // 按照顺序读取对方写过来的内容
+                // Read what the other party wrote in order
                 String serviceName = input.readUTF();
                 String methodName = input.readUTF();
                 Class<?>[] parameterTypes = (Class<?>[]) input.readObject();
                 Object[] arguments = (Object[]) input.readObject();
                 Class serviceClass = serviceRegister.get(serviceName);
                 if (serviceClass == null) {
-                    throw new ClassNotFoundException(serviceName + " 没有找到!");
+                    throw new ClassNotFoundException(serviceName + " Not found!");
                 }
                 Method method = serviceClass.getMethod(methodName, parameterTypes);
                 Object result = method.invoke(serviceClass.newInstance(), arguments);
@@ -160,7 +160,7 @@ public class RPCServer {
 
             } finally {
                 try {
-                    // 这里就不写 output!=null才关闭这个逻辑了
+                    // I don't write output!=null here to close this logic
                     output.close();
                     input.close();
                     client.close();
@@ -176,7 +176,7 @@ public class RPCServer {
 
 ```
 
-其次需要一个客户端：
+The second is a client：
 
 ```java
 import java.io.ObjectInputStream;
@@ -188,11 +188,11 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
- * RPC 客户端
+ * RPC client
  */
 public class RPCclient<T> {
     /**
-     * 通过动态代理将参数发送过去到 RPCServer ,RPCserver 返回结果这个方法处理成为正确的实体
+     * The parameters are sent to RPCServer through the dynamic proxy, and the RPCserver returns the result as the correct entity
      */
     public static <T> T getRemoteProxyObj(final Class<T> service, final InetSocketAddress addr) {
 
@@ -207,7 +207,7 @@ public class RPCclient<T> {
                     socket = new Socket();
                     socket.connect(addr);
 
-                    // 将实体类,参数,发送给远程调用方
+                    // Send entity classes, parameters, to remote callers
                     out = new ObjectOutputStream(socket.getOutputStream());
                     out.writeUTF(service.getSimpleName());
                     out.writeUTF(method.getName());
@@ -233,7 +233,7 @@ public class RPCclient<T> {
 
 ```
 
-再来一个测试的远程方法。
+Let's test the remote method again.。
 
 ```java
 public interface Tinterface {
@@ -249,7 +249,7 @@ public class TinterfaceImpl implements Tinterface {
 
 ```
 
-测试代码如下：
+The test code is as follows：
 
 ```java
 import java.net.InetSocketAddress;
@@ -266,17 +266,17 @@ public class RunTest {
             }
         }).start();
         Tinterface tinterface = RPCclient.getRemoteProxyObj(Tinterface.class, new InetSocketAddress("localhost", 10000));
-        System.out.println(tinterface.send("rpc 测试用例"));
+        System.out.println(tinterface.send("rpc Test cases"));
 
     }
 }
 
 ```
 
-输出 `send message rpc 测试用例` 。
+Output 'send message RPC test case'.
 
-### 异步
+### asynchronous
 
-#### 消息中间件
+#### Message middleware
 
-常见的消息中间件有 Kafka、ActiveMQ、RabbitMQ、RocketMQ ，常见的协议有 AMQP、MQTTP、STOMP、XMPP。这里不对消息队列进行拓展了，具体如何使用还是请移步官网。
+Common message middleware is Kafka, ActiveMQ, RabbitMQ, RocketMQ, and common protocols are AMQP, MQTTP, STOMP, XMPP. The message queue is not expanded here, please go to the official website for how to use it.

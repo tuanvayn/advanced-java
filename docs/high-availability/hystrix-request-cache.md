@@ -12,7 +12,7 @@ Hystrix command 执行时 8 大步骤第三步，就是检查 Request cache 是�
 
 ![hystrix-request-cache](./images/hystrix-request-cache.png)
 
-HystrixCommand 和 HystrixObservableCommand 都可以指定一个缓存 key，然后 Hystrix 会自动进行缓存，接着在同一个 request context 内，再次访问的话，就会直接取用缓存。
+HystrixCommand and HystrixObservableCommand 都可以指定一个缓存 key，然后 Hystrix 会自动进行缓存，接着在同一个 request context 内，再次访问的话，就会直接取用缓存。
 
 下面，我们结合一个具体的**业务场景**，来看一下如何使用 request cache 请求缓存技术。当然，以下代码只作为一个基本的 Demo 而已。
 

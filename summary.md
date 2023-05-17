@@ -1,8 +1,8 @@
--   高并发架构
+-   High concurrency architecture
 
-    -   [消息队列](/docs/high-concurrency/mq-interview.md)
+    -   [Message Queuing](/docs/high-concurrency/mq-interview.md)
 
-        -   [为什么使用消息队列？](/docs/high-concurrency/why-mq.md)
+        -   [Why use Message Queuing？](/docs/high-concurrency/why-mq.md)
         -   [如何保证消息队列的高可用？](/docs/high-concurrency/how-to-ensure-high-availability-of-message-queues.md)
         -   [如何保证消息不被重复消费？](/docs/high-concurrency/how-to-ensure-that-messages-are-not-repeatedly-consumed.md)
         -   [如何保证消息的可靠性传输？](/docs/high-concurrency/how-to-ensure-the-reliable-transmission-of-messages.md)
@@ -10,20 +10,20 @@
         -   [如何解决消息队列的延时以及过期失效问题？](/docs/high-concurrency/mq-time-delay-and-expired-failure.md)
         -   [如何设计一个消息队列？](/docs/high-concurrency/mq-design.md)
 
-    -   [搜索引擎](/docs/high-concurrency/es-introduction.md)
+    -   [search engine](/docs/high-concurrency/es-introduction.md)
 
         -   [ES 的分布式架构原理是什么？](/docs/high-concurrency/es-architecture.md)
         -   [ES 写入数据的工作原理是什么？](/docs/high-concurrency/es-write-query-search.md)
         -   [ES 在数十亿级别数量下如何提高查询效率？](/docs/high-concurrency/es-optimizing-query-performance.md)
         -   [ES 生产集群的部署架构是什么？](/docs/high-concurrency/es-production-cluster.md)
 
-    -   缓存
+    -   cache
 
         -   [在项目中缓存是如何使用的？](/docs/high-concurrency/why-cache.md)
-        -   [Redis 和 Memcached 有什么区别？](/docs/high-concurrency/redis-single-thread-model.md)
+        -   [Redis and Memcached 有什么区别？](/docs/high-concurrency/redis-single-thread-model.md)
         -   [Redis 都有哪些数据类型以及适用场景？](/docs/high-concurrency/redis-data-types.md)
         -   [Redis 的过期策略都有哪些？](/docs/high-concurrency/redis-expiration-policies-and-lru.md)
-        -   [如何保证 Redis 高并发、高可用？](/docs/high-concurrency/how-to-ensure-high-concurrency-and-high-availability-of-redis.md)
+        -   [如何保证 Redis High concurrency、高可用？](/docs/high-concurrency/how-to-ensure-high-concurrency-and-high-availability-of-redis.md)
         -   [Redis 主从架构是怎样的？](/docs/high-concurrency/redis-master-slave.md)
         -   [Redis 的持久化有哪几种方式？](/docs/high-concurrency/redis-persistence.md)
         -   [Redis 如何基于哨兵集群实现高可用？](/docs/high-concurrency/redis-sentinel.md)
@@ -33,56 +33,56 @@
         -   [如何解决 Redis 的并发竞争问题？](/docs/high-concurrency/redis-cas.md)
         -   [生产环境中的 Redis 是怎么部署的？](/docs/high-concurrency/redis-production-environment.md)
 
-    -   分库分表
+    -   Partition databases and tables
 
-        -   [为什么要分库分表？](/docs/high-concurrency/database-shard.md)
+        -   [Why should you split databases and tables?？](/docs/high-concurrency/database-shard.md)
         -   [分库分表如何平滑过渡？](/docs/high-concurrency/database-shard-method.md)
         -   [设计一个动态扩容缩容的分库分表方案？](/docs/high-concurrency/database-shard-dynamic-expand.md)
         -   [分库分表之后，id 主键如何处理？](/docs/high-concurrency/database-shard-global-id-generate.md)
 
-    -   读写分离
+    -   Read and write splitting
 
         -   [如何实现 MySQL 的读写分离？](/docs/high-concurrency/mysql-read-write-separation.md)
 
-    -   高并发系统
+    -   High concurrency system
         -   [如何设计一个高并发系统？](/docs/high-concurrency/high-concurrency-design.md)
 
-*   分布式系统
+*   Distributed systems
 
-    -   [面试连环炮](/docs/distributed-system/distributed-system-interview.md)
-    -   系统拆分
+    -   [Interview serial gun](/docs/distributed-system/distributed-system-interview.md)
+    -   System splitting
 
         -   [为什么要进行系统拆分？](/docs/distributed-system/why-dubbo.md)
 
-    -   分布式服务框架
+    -   Distributed service framework
 
         -   [说一下 Dubbo 的工作原理？](/docs/distributed-system/dubbo-operating-principle.md)
         -   [Dubbo 支持哪些序列化协议？](/docs/distributed-system/dubbo-serialization-protocol.md)
         -   [Dubbo 负载均衡策略和集群容错策略？](/docs/distributed-system/dubbo-load-balancing.md)
-        -   [Dubbo 的 SPI 思想是什么？](/docs/distributed-system/dubbo-spi.md)
+        -   [Dubbo target SPI 思想是什么？](/docs/distributed-system/dubbo-spi.md)
         -   [如何基于 Dubbo 进行服务治理？](/docs/distributed-system/dubbo-service-management.md)
         -   [分布式服务接口的幂等性如何设计？](/docs/distributed-system/distributed-system-idempotency.md)
         -   [分布式服务接口请求的顺序性如何保证？](/docs/distributed-system/distributed-system-request-sequence.md)
-        -   [如何自己设计一个类似 Dubbo 的 RPC 框架？](/docs/distributed-system/dubbo-rpc-design.md)
+        -   [如何自己设计一个类似 Dubbo target RPC 框架？](/docs/distributed-system/dubbo-rpc-design.md)
         -   [CAP 定理的 P 是什么？](/docs/distributed-system/distributed-system-cap.md)
 
-    -   分布式锁
+    -   Distributed locks
 
         -   [Zookeeper 都有哪些应用场景？](/docs/distributed-system/zookeeper-application-scenarios.md)
         -   [分布式锁如何设计？](/docs/distributed-system/distributed-lock-redis-vs-zookeeper.md)
 
-    -   分布式事务
+    -   Distributed transactions
 
         -   [分布式事务了解吗？](/docs/distributed-system/distributed-transaction.md)
 
-    -   分布式会话
+    -   Distributed sessions
         -   [集群分布式 Session 如何实现？](/docs/distributed-system/distributed-session.md)
 
 *   高可用架构
 
     -   基于 Hystrix 实现高可用
 
-        -   [Hystrix 介绍](/docs/high-availability/hystrix-introduction.md)
+        -   [Hystrix introduce](/docs/high-availability/hystrix-introduction.md)
         -   [电商网站详情页系统架构](/docs/high-availability/e-commerce-website-detail-page-architecture.md)
         -   [Hystrix 线程池技术实现资源隔离](/docs/high-availability/hystrix-thread-pool-isolation.md)
         -   [Hystrix 信号量机制实现资源隔离](/docs/high-availability/hystrix-semphore-isolation.md)
@@ -122,13 +122,13 @@
 
     -   Spring Cloud 微服务架构
         -   [什么是微服务？微服务之间是如何独立通讯的？](/docs/micro-services/what's-microservice-how-to-communicate.md)
-        -   Spring Cloud 和 Dubbo 有哪些区别？
-        -   Spring Boot 和 Spring Cloud，谈谈你对它们的理解？
+        -   Spring Cloud and Dubbo 有哪些区别？
+        -   Spring Boot and Spring Cloud，谈谈你对它们的理解？
         -   什么是服务熔断？什么是服务降级？
         -   微服务的优缺点分别是什么？说一下你在项目开发中碰到的坑？
         -   [你所知道的微服务技术栈都有哪些？](/docs/micro-services/micro-services-technology-stack.md)
         -   [微服务治理策略](/docs/micro-services/micro-service-governance.md)
-        -   Eureka 和 Zookeeper 都可以提供服务注册与发现的功能，它们有什么区别？
+        -   Eureka and Zookeeper 都可以提供服务注册与发现的功能，它们有什么区别？
         -   [谈谈服务发现组件 Eureka 的主要调用过程？](/docs/micro-services/how-eureka-enable-service-discovery-and-service-registration.md)
 
 *   海量数据处理

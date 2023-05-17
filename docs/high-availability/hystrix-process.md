@@ -6,7 +6,7 @@
 -   执行这个 command；
 -   配置这个 command 对应的 group 和线程池。
 
-这里，我们要讲一下，你开始执行这个 command，调用了这个 command 的 execute() 方法之后，Hystrix 底层的执行流程和步骤以及原理是什么。
+这里，我们要讲一下，你开始执行这个 command，调用了这个 command target execute() 方法之后，Hystrix 底层的执行流程和步骤以及原理是什么。
 
 在讲解这个流程的过程中，我会带出来 Hystrix 其他的一些核心以及重要的功能。
 
@@ -35,7 +35,7 @@ HystrixObservableCommand hystrixObservableCommand = new HystrixObservableCommand
 
 要执行 command，可以在 4 个方法中选择其中的一个：execute()、queue()、observe()、toObservable()。
 
-其中 execute() 和 queue() 方法仅仅对 HystrixCommand 适用。
+其中 execute() and queue() 方法仅仅对 HystrixCommand 适用。
 
 -   execute()：调用后直接 block 住，属于同步调用，直到依赖服务返回单条结果，或者抛出异常。
 -   queue()：返回一个 Future，属于异步调用，后面可以通过 Future 获取单条结果。
@@ -67,7 +67,7 @@ public R execute() {
 final Future<R> delegate = toObservable().toBlocking().toFuture();
 ```
 
-也就是说，先通过 toObservable() 获得 Future 对象，然后调用 Future 的 get() 方法。那么，其实无论是哪种方式执行 command，最终都是依赖于 toObservable() 去执行的。
+也就是说，先通过 toObservable() 获得 Future 对象，然后调用 Future target get() 方法。那么，其实无论是哪种方式执行 command，最终都是依赖于 toObservable() 去执行的。
 
 ### 步骤三：检查是否开启缓存（不太常用）
 
@@ -85,7 +85,7 @@ final Future<R> delegate = toObservable().toBlocking().toFuture();
 
 ### 步骤六：执行 command
 
-调用 HystrixObservableCommand 对象的 construct() 方法，或者 HystrixCommand 的 run() 方法来实际执行这个 command。
+调用 HystrixObservableCommand 对象的 construct() 方法，或者 HystrixCommand target run() 方法来实际执行这个 command。
 
 -   HystrixCommand.run() 返回单条结果，或者抛出异常。
 
@@ -125,7 +125,7 @@ observable.subscribe(new Observer<ProductInfo>() {
 
 如果是采用线程池方式，并且 HystrixCommand.run() 或者 HystrixObservableCommand.construct() 的执行时间超过了 timeout 时长的话，那么 command 所在的线程会抛出一个 TimeoutException，这时会执行 fallback 降级机制，不会去管 run() 或 construct() 返回的值了。另一种情况，如果 command 执行出错抛出了其它异常，那么也会走 fallback 降级。这两种情况下，Hystrix 都会发送异常事件给断路器统计。
 
-**注意**，我们是不可能终止掉一个调用严重延迟的依赖服务的线程的，只能说给你抛出来一个 TimeoutException。
+**note**，我们是不可能终止掉一个调用严重延迟的依赖服务的线程的，只能说给你抛出来一个 TimeoutException。
 
 如果没有 timeout，也正常执行的话，那么调用线程就会拿到一些调用依赖服务获取到的结果，然后 Hystrix 也会做一些 logging 记录和 metric 度量统计。
 

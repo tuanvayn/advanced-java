@@ -1,82 +1,82 @@
-# 迁移到微服务综述
+# Overview of migrating to microservices
 
-迁移单体式应用到微服务架构意味着一系列现代化过程，有点像这几代开发者一直在做的事情，实时上，当迁移时，我们可以重用一些想法。
+Migrating monolithic applications to microservices architectures means a series of modernization processes, a bit like what these generations of developers have been doing, and in real time, when migrating, we can reuse some ideas.
 
-一个策略是：不要大规模（big bang）重写代码（只有当你承担重建一套全新基于微服务的应用时候可以采用重写这种方法）。重写代码听起来很不错，但实际上充满了风险最终可能会失败，就如 Martin Fowler 所说：
+One strategy is not to rewrite the code on a large scale (only if you are responsible for rebuilding a whole new microservices-based application). Rewriting code sounds great, but it's actually fraught with risks and can eventually fail, as Martin Fowler puts it:
 
 > “the only thing a Big Bang rewrite guarantees is a Big Bang!”
 
-相反，应该采取逐步迁移单体式应用的策略，通过逐步生成微服务新应用，与旧的单体式应用集成，随着时间推移，单体式应用在整个架构中比例逐渐下降直到消失或者成为微服务架构一部分。这个策略有点像在高速路上限速到 70 迈对车做维护，尽管有挑战，但是比起重写的风险小很多。
+Instead, you should adopt a strategy of gradually migrating monolithic applications, by gradually building new microservices applications, integrating with old monolithic applications, and over time, the proportion of monolithic applications in the overall architecture gradually decreases until they disappear or become part of the microservices architecture. This strategy is a bit like maintaining the car at a highway speed limit of 70 miles, and although it is challenging, it is much less risky than rewriting.
 
-Martin Fowler 将这种现代化策略成为绞杀（Strangler）应用，名字来源于雨林中的绞杀藤（strangler vine），也叫绞杀榕 (strangler fig)。绞杀藤为了爬到森林顶端都要缠绕着大树生长，一段时间后，树死了，留下树形藤。这种应用也使用同一种模式，围绕着传统应用开发了新型微服务应用，传统应用会渐渐退出舞台。
+Martin Fowler called this modern strategy the Strangler application, named after the strangler vine in the rainforest, also known as the strangler fig. In order to climb to the top of the forest, the strangled vine had to grow around a large tree, and after a while, the tree died, leaving behind the tree-shaped vine. This application uses the same pattern, and new microservice applications are developed around traditional applications, which will gradually fade from the stage.
 
-我们来看看其他可行策略。
+Let's take a look at other possible strategies。
 
-# 策略 1——停止挖掘
+# Strategy 1 – Stop mining
 
-Law of Holes 是说当自己进洞就应该停止挖掘。对于单体式应用不可管理时这是最佳建议。换句话说，应该停止让单体式应用继续变大，也就是说当开发新功能时不应该为旧单体应用添加新代码，最佳方法应该是将新功能开发成独立微服务。如下图所示：
+The Law of Holes says that when you enter a hole, you should stop digging. This is the best recommendation for monolithic applications when they are not manageable. In other words, monolithic applications should stop growing, meaning that when developing new features, you should not add new code to old monolithic applications, and the best way to develop new features into independent microservices. As shown in the following figure:
 
 ![1](./images/Law-of-Holes.png)
 
-除了新服务和传统应用，还有两个模块，其一是请求路由器，负责处理入口（http）请求，有点像之前提到的 API 网关。路由器将新功能请求发送给新开发的服务，而将传统请求还发给单体式应用。
+In addition to the new services and legacy applications, there are two modules, one of which is the request router, which handles the ingress (http) requests, a bit like the API gateway mentioned earlier. The router sends new feature requests to newly developed services, while traditional requests are sent back to monolithic applications.
 
-另外一个是胶水代码（glue code），将微服务和单体应用集成起来，微服务很少能独立存在，经常会访问单体应用的数据。胶水代码，可能在单体应用或者为服务或者二者兼而有之，负责数据整合。微服务通过胶水代码从单体应用中读写数据。​
+The other is glue code, which integrates microservices and monolithic applications, which rarely exist independently and often access the data of monolithic applications. The glue code, which may be applied as a monolith, as a service, or both, is responsible for data integration. Microservices read and write data from monolithic applications through glue code. ​
 
-微服务有三种方式访问单体应用数据：
+Microservices have three ways to access monolithic application data：
 
--   换气单体应用提供的远程 API
--   直接访问单体应用数据库
--   自己维护一份从单体应用中同步的数据
+-   Remote API provided by the ventilation monomer application
+-   Directly access the monolithic application database
+-   Maintain a copy of the data synced from a monolithic application yourself
 
-胶水代码也被称为容灾层（anti-corruption layer），这是因为胶水代码保护微服务全新域模型免受传统单体应用域模型污染。胶水代码在这两种模型间提供翻译功能。术语 anti-corruption layer 第一次出现在 Eric Evans 撰写的必读书 _Domain Driven Design_，随后就被提炼为一篇白皮书。开发容灾层可能有点不是很重要，但却是避免单体式泥潭的必要部分。
+Glue code is also known as the anti-corruption layer because the glue code protects the new domain model of microservices from the traditional monolithic application domain model. The glue code provides translation capabilities between the two models. The term anti-corruption layer first appeared in Eric Evans' must-read _Domain Driven Design_ and was later distilled into a white paper. Developing a disaster tolerance layer may not be very important, but it is a necessary part of avoiding monolithic quagmire.
 
-将新功能以轻量级微服务方式实现由很多优点，例如可以阻止单体应用变的更加无法管理。微服务本身可以开发、部署和独立扩展。采用微服务架构会给开发者带来不同的切身感受。
+Implementing new features as lightweight microservices has many advantages, such as preventing monolithic applications from becoming more unmanageable. Microservices themselves can be developed, deployed, and scaled independently. Adopting a microservices architecture makes a difference for developers.
 
-然而，这方法并不解决任何单体式本身问题，为了解决单体式本身问题必须深入单体应用 ​ 做出改变。我们来看看这么做的策略。
+However, this method does not solve any monomer itself problem, in order to solve the monomer itself problem must be deeply applied to make changes. Let's take a look at the strategy for doing so.
 
-# 策略 2——将前端和后端分离
+# Strategy 2 – Separate the front-end and back-end
 
-减小单体式应用复杂度的策略是讲表现层和业务逻辑、数据访问层分开。典型的企业应用至少有三个不同元素构成：
+The strategy to reduce the complexity of monolithic applications is to separate the presentation layer from the business logic and data access layers. A typical enterprise application consists of at least three distinct elements:
 
-1. 表现层——处理 HTTP 请求，要么响应一个 RESTAPI 请求，要么是提供一个基于 HTML 的图形接口。对于一个复杂用户接口应用，表现层经常是代码重要的部分。
+1. Presentation layer – handles HTTP requests, either in response to a RESTAPI request or by providing an HTML-based graphical interface. For a complex user interface application, the presentation layer is often an important part of the code.
 
-2. 业务逻辑层——完成业务逻辑的应用核心。
+2. Business logic layer - the core of the application that completes the business logic.
 
-3. 数据访问层——访问基础元素，例如数据库和消息代理。
+3.Data access layer – Access foundational elements such as databases and message brokers.
 
-在表现层与业务数据访问层之间有清晰的隔离。业务层有由若干方面组成的粗粒度（coarse-grained）的 API，内部包含了业务逻辑元素。API 是可以将单体业务分割成两个更小应用的天然边界，其中一个应用是表现层，另外一个是业务和数据访问逻辑。分割后，表现逻辑应用远程调用业务逻辑应用，下图表示迁移前后架构不同：​
+There is a clear separation between the presentation layer and the business data access layer. The business layer has a coarse-grained API composed of several aspects, which contains business logic elements. APIs are natural boundaries that can split a monolithic business into two smaller applications, one of which is the presentation layer and the other is the business and data access logic. After the split, the logic app remotely calls the business logic app, and the following diagram shows the different architecture before and after migration: ​
 
 ![2](./images/Before-and-after-migration.png)
 
-单体应用这么分割有两个好处，其一使得应用两部分开发、部署和扩展各自独立，特别地，允许表现层开发者在用户界面上快速选择，进行 A/B 测试；其二，使得一些远程 API 可以被微服务调用。
+This division of monolithic applications has two advantages, one of which makes the development, deployment and extension of the two parts of the application independent, in particular, allowing presentation layer developers to quickly select on the user interface for AB testing; Second, it enables some remote APIs to be called by microservices.
 
-然而，这种策略只是部分的解决方案。很可能应用的两部分之一或者全部都是不可管理的，因此需要使用第三种策略来消除剩余的单体架构。
+However, this strategy is only part of the solution. It is likely that one or both parts of the application are unmanageable, so a third strategy is required to eliminate the remaining monolithic architecture.
 
-# 策略 3——抽出服务
+# Strategy 3 – Pull out services
 
-第三种迁移策略就是从单体应用中抽取出某些模块成为独立微服务。每当抽取一个模块变成微服务，单体应用就变简单一些；一旦转换足够多的模块，单体应用本身已经不成为问题了，要么消失了，要么简单到成为一个服务。
+The third migration strategy is to extract certain modules from monolithic applications to become independent microservices. Whenever a module is extracted into a microservice, the monolithic application becomes simpler; Once enough modules are converted, the monolithic application itself is no longer a problem, either disappears or is simple enough to become a service.
 
-## 排序那个模块应该被转成微服务
+## The sequencing module should be converted to a microservice
 
-一个巨大的复杂单体应用由成十上百个模块构成，每个都是被抽取对象。决定第一个被抽取模块一般都是挑战，一般最好是从最容易抽取的模块开始，这会让开发者积累足够经验，这些经验可以为后续模块化工作带来巨大好处。
+A huge complex monolithic application consists of dozens or hundreds of modules, each of which is an extracted object. Deciding on the first module to be extracted is generally a challenge, and it is generally best to start with the easiest module to extract, which will allow developers to accumulate enough experience that can bring great benefits to subsequent modularization efforts.
 
-转换模块成为微服务一般很耗费时间，一般可以根据获益程度来排序，一般从经常变化模块开始会获益最大。一旦转换一个模块为微服务，就可以将其开发部署成独立模块，从而加速开发进程。
+Converting modules into microservices is generally time-consuming and can generally be sorted according to the degree of benefit, generally starting with frequently changing modules to benefit the most. Once a module is transformed into a microservice, its development can be deployed as a standalone module, speeding up the development process.
 
-将资源消耗大户先抽取出来也是排序标准之一。例如，将内存数据库抽取出来成为一个微服务会非常有用，可以将其部署在大内存主机上。同样的，将对计算资源很敏感的算法应用抽取出来也是非常有益的，这种服务可以被部署在有很多 CPU 的主机上。通过将资源消耗模块转换成微服务，可以使得应用易于扩展。
+Extracting large resource consumers first is also one of the sorting criteria. For example, it can be useful to extract an in-memory database to become a microservice that can be deployed on a large memory host. Similarly, it is beneficial to extract algorithmic applications that are sensitive to computing resources, and such services can be deployed on hosts with a lot of CPUs. By transforming resource-consuming modules into microservices, you can make your application easily scalable.
 
-查找现有粗粒度边界来决定哪个模块应该被抽取，也是很有益的，这使得移植工作更容易和简单。例如，只与其他应用异步同步消息的模块就是一个明显边界，可以很简单容易地将其转换为微服务。
+It is also beneficial to look at existing coarse-grained boundaries to decide which module should be extracted, which makes porting easier and simpler. For example, a module that only synchronizes messages asynchronously with other apps is a clear boundary that can be easily transformed into a microservice.
 
-## 如何抽取模块
+## How to extract modules
 
-抽取模块第一步就是定义好模块和单体应用之间粗粒度接口，由于单体应用需要微服务的数据，反之亦然，因此更像是一个双向 API。因为必须在负责依赖关系和细粒度接口模式之间做好平衡，因此开发这种 API 很有挑战性，尤其对使用域模型模式的业务逻辑层来说更具有挑战，因此经常需要改变代码来解决依赖性问题，如图所示：
+The first step in extracting a module is to define a coarse-grained interface between the module and the monolithic application, which is more like a bidirectional API because the monolithic application requires data from microservices and vice versa. Because of the balance that must be balanced between responsible dependencies and fine-grained interface patterns, developing such APIs is challenging, especially for the business logic layer that uses the domain model pattern, so it is often necessary to change the code to solve the dependency problem, as shown in the figure:
 
-一旦完成粗粒度接口，也就将此模块转换成独立微服务。为了实现，必须写代码使得单体应用和微服务之间通过使用进程间通信（IPC）机制的 API 来交换信息。如图所示迁移前后对比：
+Once the coarse-grained interface is complete, the module is transformed into a standalone microservice. To achieve this, code must be written to enable the exchange of information between monolithic applications and microservices through APIs that use the interprocess communication (IPC) mechanism. The comparison before and after migration is shown in the figure:
 
 ![3](./images/30103116_ZCcM.png)
 
-此例中，正在使用 Y 模块的 Z 模块是备选抽取模块，其元素正在被 X 模块使用，迁移第一步就是定义一套粗粒度 APIs，第一个接口应该是被 X 模块使用的内部接口，用于激活 Z 模块；第二个接口是被 Z 模块使用的外部接口，用于激活 Y 模块。
+In this example, the Z module that is using the Y module is an alternative extraction module, and its elements are being used by the X module, and the first step in migration is to define a set of coarse-grained APIs, and the first interface should be the internal interface used by the X module to activate the Z module; The second interface is the external interface used by the Z module to activate the Y module.
 
-迁移第二步就是将模块转换成独立服务。内部和外部接口都使用基于 IPC 机制的代码，一般都会将 Z 模块整合成一个微服务基础框架，来出来割接过程中的问题，例如服务发现。
+The second step in the migration is to convert the module into a standalone service. The internal and external interfaces use code based on the IPC mechanism, and the Z module is generally integrated into a microservice infrastructure framework to solve problems in the cutover process, such as service discovery.
 
-抽取完模块，也就可以开发、部署和扩展另外一个服务，此服务独立于单体应用和其它服务。可以从头写代码实现服务；这种情况下，将服务和单体应用整合的 API 代码成为容灾层，在两种域模型之间进行翻译工作。每抽取一个服务，就朝着微服务方向前进一步。随着时间推移，单体应用将会越来越简单，用户就可以增加更多独立的微服务。
-将现有应用迁移成微服务架构的现代化应用，不应该通过从头重写代码方式实现，相反，应该通过逐步迁移的方式。有三种策略可以考虑：将新功能以微服务方式实现；将表现层与业务数据访问层分离；将现存模块抽取变成微服务。随着时间推移，微服务数量会增加，开发团队的弹性和效率将会大大增加。
+Once the module is extracted, you can develop, deploy, and extend another service that is independent of the monolithic application and other services. You can write code from scratch to implement the service; In this case, the API code that integrates the service and the monolithic application becomes the disaster recovery layer, translating between the two domain models. With each service extracted, one step in the direction of microservices. Over time, monolithic applications will become simpler and users will be able to add more independent microservices.
+Migrating an existing application to a modern application with a microservices architecture should not be achieved by rewriting code from scratch, but rather by gradual migration. There are three strategies to consider: implementing new features as microservices; Decouple the presentation layer from the business data access layer; Extract existing modules into microservices. Over time, the number of microservices will increase, and the resiliency and efficiency of development teams will increase significantly.

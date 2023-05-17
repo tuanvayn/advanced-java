@@ -1,111 +1,112 @@
-# 前言
+# foreword
 
-部署一个单体式应用意味运行大型应用的多个副本，典型的提供若干个（N）服务器（物理或者虚拟），运行若干个（M）个应用实例。部署单体式应用不会很直接，但是肯定比部署微服务应用简单些。
+Deploying a monolithic application means running multiple copies of a large application, typically providing several (N) servers (physical or virtual), running several (M) application instances. Deploying a monolithic application won't be straightforward, but it's certainly easier than deploying a microservices application.
 
-一个微服务应用由上百个服务构成，服务可以采用不同语言和框架分别写就。每个服务都是一个单一应用，可以有自己的部署、资源、扩展和监控需求。例如，可以根据服务需求运行若干个服务实例，除此之外，每个实例必须有自己的 CPU，内存和 I/O 资源。尽管很复杂，但是更挑战的是服务部署必须快速、可靠和性价比高。
+A microservice application consists of hundreds of services, which can be written in different languages and frameworks. Each service is a single application that can have its own deployment, resource, scaling and monitoring requirements. For example, several service instances can be run according to the service requirements, in addition, each instance must have its own CPU, memory and IO resources. Even more challenging, though complex, is that service deployment must be fast, reliable, and cost-effective.
 
-有一些微服务部署的模式，先讨论一下每个主机多服务实例的模式。
+There are some patterns of microservice deployment, first discuss the pattern of multiple service instances per host.
 
-# 单主机多服务实例模式
+# Single host multi-service instance mode
 
-部署微服务的一种方法就是单主机多服务实例模式，使用这种模式，需要提供若干台物理或者虚拟机，每台机器上运行多个服务实例。很多情况下，这是传统的应用部署方法。每个服务实例运行一个或者多个主机的 well-known 端口，主机可以看做宠物。
+One way to deploy microservices is the single-host multi-service instance mode. Using this mode, several physical or virtual machines need to be provided, and multiple service instances run on each machine. In many cases, this is the traditional approach to application deployment. Each service instance runs one or more well-known ports of the host, which can be regarded as a pet.
 
-下图展示的是这种架构：
+The diagram below shows this architecture：
 
 ![deployment-strategy-1](./images/deployment-strategy-1.png)
 
-这种模式有一些参数，一个参数代表每个服务实例由多少进程构成。例如，需要在 Apache Tomcat Server 上部署一个 Java 服务实例作为 web 应用。一个 Node.js 服务实例可能有一个父进程和若干个子进程构成。
+This mode has some parameters, one parameter represents how many processes each service instance consists of. For example, a Java service instance needs to be deployed on Apache Tomcat Server as a web application. A Node.js service instance may consist of a parent process and several child processes.
 
-另外一个参数定义同一进程组内有多少服务实例运行。例如，可以在同一个 Apache Tomcat Server 上运行多个 Java web 应用，或者在同一个 OSGI 容器内运行多个 OSGI 捆绑实例。
+Another parameter defines how many instances of the service are running within the same process group. For example, you can run multiple Java web applications on the same Apache Tomcat Server, or run multiple instances of OSGI bundles inside the same OSGI container.
 
-单主机多服务实例模式也是优缺点并存。主要优点在于资源利用有效性。多服务实例共享服务器和操作系统，如果进程组运行多个服务实例效率会更高，例如，多个 web 应用共享同一个 Apache Tomcat Server 和 JVM。
+The single-host multi-service instance mode also has advantages and disadvantages. The main advantage is resource utilization efficiency. Multiple service instances share the server and operating system. It is more efficient if the process group runs multiple service instances, for example, multiple web applications share the same Apache Tomcat Server and JVM.
 
-另一个优点在于部署服务实例很快。只需将服务拷贝到主机并启动它。如果服务用 Java 写的，只需要拷贝 JAR 或者 WAR 文件即可。对于其它语言，例如 Node.js 或者 Ruby，需要拷贝源码。也就是说网络负载很低。
+Another advantage is that deploying service instances is fast. Just copy the service to the host and start it. If the service is written in Java, just copy the JAR or WAR file. For other languages, such as Node.js or Ruby, you need to copy the source code. That is, the network load is low.
 
-因为没有太多负载，启动服务很快。如果服务是自包含的进程，只需要启动就可以；否则，如果是运行在容器进程组中的某个服务实例，则需要动态部署进容器中，或者重启容器。
+Since there is not much load, starting the service is fast. If the service is a self-contained process, it only needs to be started; otherwise, if it is a service instance running in a container process group, it needs to be dynamically deployed into the container, or the container needs to be restarted.
 
-除了上述优点外，单主机多服务实例也有缺陷。其中一个主要缺点是服务实例间很少或者没有隔离，除非每个服务实例是独立进程。如果想精确监控每个服务实例资源使用，就不能限制每个实例资源使用。因此有可能造成某个糟糕的服务实例占用了主机的所有内存或者 CPU。
+In addition to the above advantages, single-host multiple service instances also have drawbacks. One of the main disadvantages is that there is little or no isolation between service instances unless each service instance is a separate process. If you want to accurately monitor the resource usage of each service instance, you cannot limit the resource usage of each instance. So it is possible for a bad service instance to take up all the memory or CPU of the host.
 
-同一进程内多服务实例没有隔离。所有实例有可能，例如，共享同一个 JVM heap。某个糟糕服务实例很容易攻击同一进程中其它服务；更甚至于，有可能无法监控每个服务实例使用的资源情况。
+There is no isolation for multiple service instances within the same process. All instances may, for example, share the same JVM heap. A bad service instance can easily attack other services in the same process; even more, it may not be possible to monitor the resources used by each service instance.
 
-另一个严重问题在于运维团队必须知道如何部署的详细步骤。服务可以用不同语言和框架写成，因此开发团队肯定有很多需要跟运维团队沟通事项。其中复杂性增加了部署过程中出错的可能性。
+Another serious problem is that the operation and maintenance team must know the detailed steps of how to deploy. Services can be written in different languages and frameworks, so the development team must have a lot to communicate with the operation and maintenance team. The complexity increases the possibility of errors during the deployment process.
 
-可以看到，尽管熟悉，但是单主机多服务实例有很多严重缺陷。下面看看是否有其他部署微服务方式能够避免这些问题。
+As you can see, despite the familiarity, single host multiple service instances have a number of serious flaws. Let's see if there are other ways to deploy microservices that can avoid these problems.
 
-# 单主机单服务实例模式
+# Single host single service instance mode
 
-另外一种部署微服务方式是单主机单实例模式。当使用这种模式，每个主机上服务实例都是各自独立的。有两种不同实现模式：单虚拟机单实例和单容器单实例。
+Another way to deploy microservices is the single-host single-instance mode. When using this mode, each service instance on each host is independent. There are two different implementation modes: single-VM single-instance and single-container single-instance.
 
-## 单虚拟机单实例模式
+## Single VM Single Instance Mode
 
-但是用单虚拟机单实例模式，一般将服务打包成虚拟机映像（image），例如一个 Amazon EC2 AMI。每个服务实例是一个使用此映像启动的 VM（例如，EC2 实例）。下图展示了此架构：
+But with the single virtual machine single instance mode, the service is usually packaged as a virtual machine image (image), such as an Amazon EC2 AMI. Each service instance is a VM (for example, an EC2 instance) launched using this image. The following diagram shows this architecture:
 
 ![deployment-strategy-2](./images/deployment-strategy-2.png)
 
-Netfix 采用这种架构部署 video streaming service。Netfix 使用 Aminator 将每个服务打包成一个 EC2 AMI。每个运行服务实例就是一个 EC2 实例。
+Netflix uses this architecture to deploy video streaming service. Netflix uses Aminator to package each service into an EC2 AMI. Each running service instance is an EC2 instance.
 
-有很多工具可以用来搭建自己的 VMs。可以配置持续集成（CI）服务（例如，Jenkins）避免 Aminator 将服务打包成 EC2 AMI。packer.io 是自动虚机映像创建的另外一种选择。跟 Aminator 不同，它支持一系列虚拟化技术，例如 EC2，DigitalOcean，VirtualBox 和 VMware。​
+There are many tools that can be used to set up your own VMs. A continuous integration (CI) service (for example, Jenkins) can be configured to prevent Aminator from packaging the service into an EC2 AMI. packer.io is another option for automated VM image creation. Unlike Aminator, it supports a range of virtualization technologies such as EC2, DigitalOcean, VirtualBox and VMware.
 
-Boxfuse 公司有一个创新方法创建虚机映像，克服了如下缺陷。Boxfuse 将 java 应用打包成最小虚机映像，它们创建迅速，启动很快，因为对外暴露服务接口少而更加安全。
+Boxfuse has an innovative approach to creating virtual machine images that overcomes the following drawbacks. Boxfuse packages java applications into minimal virtual machine images, which are created quickly and started quickly, and are safer because there are fewer service interfaces exposed to the outside world.
 
-CloudNative 公司有一个用于创建 EC2 AMI 的 SaaS 应用，Bakery。用户微服务架构通过测试后，可以配置自己的 CI 服务器激活 Bakery。Bakery 将服务打包成 AMI。使用如 Bakery 的 SaaS 应用意味着用户不需要浪费时间在设置自己的 AMI 创建架构。
+The CloudNative company has a SaaS application for creating EC2 AMIs, Bakery. After the user microservice architecture has passed the test, you can configure your own CI server to activate Bakery. Bakery packages services as AMIs. Using a SaaS application like Bakery means users don't need to waste time setting up their own AMI creation architecture.
 
-每虚拟机服务实例模式有许多优势，主要的 VM 优势在于每个服务实例都是完全独立运行的，都有各自独立的 CPU 和内存而不会被其它服务占用。
+The service instance per virtual machine model has many advantages, the main VM advantage is that each service instance runs completely independently, has its own independent CPU and memory and will not be occupied by other services.
 
-另外一个好处在于用户可以使用成熟云架构，例如 AWS 提供的，云服务都提供如负载均衡和扩展性等有用功能。
+Another benefit is that users can use mature cloud architectures, such as those provided by AWS, and cloud services provide useful functions such as load balancing and scalability.
 
-还有一个好处在于服务实施技术被自包含了。一旦服务被打包成 VM 就成为一个黑盒子。VM 的管理 API 成为部署服务的 API，部署成为一个非常简单和可靠的事情。
+Another benefit is that the service implementation technology is self-contained. Once a service is packaged into a VM it becomes a black box. The VM's management API becomes the deployment service's API, and deployment becomes a very simple and reliable affair.
 
-单虚拟机单实例模式也有缺点。一个缺点就是资源利用效率不高。每个服务实例占用整个虚机的资源，包括操作系统。而且，在一个典型的公有 IaaS 环境，虚机资源都是标准化的，有可能未被充分利用。
+The single-VM single-instance model also has disadvantages. One disadvantage is the inefficient use of resources. Each service instance occupies the resources of the entire virtual machine, including the operating system. Moreover, in a typical public IaaS environment, virtual machine resources are standardized and may not be fully utilized.
 
-而且，公有 IaaS 根据 VM 来收费，而不管虚机是否繁忙；例如 AWS 提供了自动扩展功能，但是对随需应用缺乏快速响应，使得用户不得不多部署虚机，从而增加了部署费用。
+Moreover, public IaaS charges based on the VM, regardless of whether the virtual machine is busy; for example, AWS provides an automatic scaling function, but lacks a quick response to on-demand applications, forcing users to deploy more virtual machines, thereby increasing deployment costs.
 
-另外一个缺点在于部署服务新版本比较慢。虚机镜像因为大小原因创建起来比较慢，同样原因，虚机初始化也比较慢，操作系统启动也需要时间。但是这并不一直是这样，一些轻量级虚机，例如使用 Boxfuse 创建的虚机，就比较快。
+Another disadvantage is that deploying new versions of services is slow. The virtual machine image is relatively slow to create due to its size. For the same reason, the virtual machine initialization is also relatively slow, and the operating system startup also takes time. But this is not always the case, some lightweight VMs, such as those created with Boxfuse, are faster.
 
-第三个缺点是对于运维团队，它们负责许多客制化工作。除非使用如 Boxfuse 之类的工具，可以帮助减轻大量创建和管理虚机的工作；否则会占用大量时间从事与核心业务不太无关的工作。
+The third disadvantage is that for the operation and maintenance team, they are responsible for a lot of customization work. Unless you use a tool like Boxfuse that can help relieve a lot of the work of creating and managing virtual machines; otherwise, a lot of time will be spent on work that is not very irrelevant to the core business.
 
-那么我们来看看另外一种仍然具有虚机特性，但是比较轻量的微服务部署方法。
+So let's take a look at another microservice deployment method that still has the characteristics of a virtual machine but is relatively lightweight
 
-# 单容器单服务实例模式
+# Single container single service instance pattern
 
-当使用这种模式时，每个服务实例都运行在各自容器中。容器是运行在操作系统层面的虚拟化机制。一个容器包含若干运行在沙箱中的进程。从进程角度来看，他们有各自的命名空间和根文件系统；可以限制容器的内存和 CPU 资源。某些容器还具有 I/O 限制，这类容器技术包括 Docker 和 Solaris Zones。
+When using this pattern, each service instance runs in its own container. A container is a virtualization mechanism that runs at the operating system level. A container contains several processes running in a sandbox. From the process point of view, they have their own namespace and root file system; the memory and CPU resources of the container can be limited. Certain containers also have IO constraints, such container technologies include Docker and Solaris Zones.
 
-下图展示了这种模式：
+The diagram below illustrates this pattern:
 
 ![deployment-strategy-3](./images/deployment-strategy-3.png)
 
-使用这种模式需要将服务打包成容器映像。一个容器映像是一个运行包含服务所需库和应用的文件系统 ​。某些容器映像由完整的 linux 根文件系统组成，其它则是轻量级的。例如，为了部署 Java 服务，需要创建包含 Java 运行库的容器映像，也许还要包含 Apache Tomcat server，以及编译过的 Java 应用。
+Using this pattern requires packaging the service as a container image. A container image is a file system that runs the libraries and applications that contain the services required. Some container images consist of a full linux root filesystem, others are lightweight. For example, to deploy a Java service, a container image needs to be created that contains the Java runtime, and perhaps the Apache Tomcat server, as well as the compiled Java application.
 
-一旦将服务打包成容器映像，就需要启动若干容器。一般在一个物理机或者虚拟机上运行多个容器，可能需要集群管理系统，例如 k8s 或者 Marathon，来管理容器。集群管理系统将主机作为资源池，根据每个容器对资源的需求，决定将容器调度到那个主机上。
+Once the service is packaged into a container image, several containers need to be started. Generally, multiple containers are run on a physical machine or a virtual machine, and a cluster management system, such as k8s or Marathon, may be required to manage the containers. The cluster management system regards the host as a resource pool, and decides which host to schedule the container to according to the resource requirements of each container.
 
-单容器单服务实例模式也是优缺点都有。容器的优点跟虚机很相似，服务实例之间完全独立，可以很容易监控每个容器消耗的资源。跟虚机相似，容器使用隔离技术部署服务。容器管理 API 也可以作为管理服务的 API。
+The single container single service instance mode also has advantages and disadvantages. The advantages of containers are similar to those of virtual machines. Service instances are completely independent, making it easy to monitor the resources consumed by each container. Similar to virtual machines, containers use isolation technology to deploy services. The container management API is also available as an API for management services.
 
-然而，跟虚机不一样，容器是一个轻量级技术。容器映像创建起来很快，例如，在笔记本电脑上，将 Spring Boot 应用打包成容器映像只需要 5 秒钟。因为不需要操作系统启动机制，容器启动也很快。当容器启动时，后台服务就启动了。
+However, unlike virtual machines, containers are a lightweight technology. Container images are created quickly, for example, packaging a Spring Boot application into a container image takes only 5 seconds on a laptop. Because no operating system startup mechanism is required, the container startup is also very fast. When the container starts, the background service is started.
 
-使用容器也有一些缺点。尽管容器架构发展迅速，但是还是不如虚机架构成熟。而且由于容器之间共享 host OS 内核因此并不像虚机那么安全。
+There are also some downsides to using containers. Although the container architecture is developing rapidly, it is still not as mature as the virtual machine architecture. And because the host OS kernel is shared between containers, it is not as secure as a virtual machine.
 
-另外，容器技术将会对管理容器映像提出许多客制化需求，除非使用如 Google Container Engine 或者 Amazon EC2 Container Service (ECS)，否则用户将同时需要管理容器架构以及虚机架构。
+In addition, container technology will put forward many customized requirements for managing container images. Unless you use Google Container Engine or Amazon EC2 Container Service (ECS), users will need to manage container architecture and virtual machine architecture at the same time.
 
-第三，容器经常被部署在按照虚机收费的架构上，很显然，客户也会增加部署费用来应对负载的增长。
+Third, containers are often deployed on an architecture that is charged according to the virtual machine. Obviously, customers will also increase deployment costs to cope with load growth.
 
-有趣的是，容器和虚机之间的区别越来越模糊。如前所述，Boxfuse 虚机启动创建都很快，Clear Container 技术面向创建轻量级虚机。unikernel 公司的技术也引起大家关注，Docker 最近收购了 Unikernel 公司。
+Interestingly, the distinction between containers and VMs is getting blurred. As mentioned earlier, Boxfuse virtual machine startup and creation are very fast, and Clear Container technology is aimed at creating lightweight virtual machines. The technology of unikernel companies has also attracted everyone's attention, and Docker recently acquired Unikernel companies.
 
-除了这些之外，server-less 部署技术，避免了前述容器和 VM 技术的缺陷，吸引了越来越多的注意。下面我们来看看。
+In addition to these, server-less deployment technology, which avoids the defects of the aforementioned container and VM technology, has attracted more and more attention. Let's take a look below.
 
-# Serverless 部署
+# Serverless deployment
 
-AWS Lambda 是 serverless 部署技术的例子，支持 Java，Node.js 和 Python 服务；需要将服务打包成 ZIP 文件上载到 AWS Lambda 就可以部署。可以提供元数据，提供处理服务请求函数的名字（一个事件）。AWS Lambda 自动运行处理请求足够多的微服务，然而只根据运行时间和消耗内存量来计费。当然细节决定成败，AWS Lambda 也有限制。但是大家都不需要担心服务器，虚拟机或者容器内的任何方面绝对吸引人。
+AWS Lambda is an example of serverless deployment technology, supporting Java, Node.js and Python services; services need to be packaged into a ZIP file and uploaded to AWS Lambda for deployment. Metadata can be provided, providing the name of the function that handles the service request (an event). AWS Lambda automatically runs microservices that handle enough requests, but is only billed based on the running time and the amount of memory consumed. Of course, the details determine success or failure, and AWS Lambda also has limitations. But you don't need to worry about servers, virtual machines, or anything in containers that is absolutely attractive.
 
-Lambda 函数 是无状态服务。一般通过激活 AWS 服务处理请求。例如，当映像上载到 S3 bucket 激活 Lambda 函数后，就可以在 DynamoDB 映像表中插入一个条目，给 Kinesis 流发布一条消息，触发映像处理动作。Lambda 函数也可以通过第三方 web 服务激活。
+Lambda functions are stateless services. Requests are typically handled by activating AWS services. For example, when an image is uploaded to an S3 bucket to activate a Lambda function, an entry can be inserted into the DynamoDB image table, a message can be published to the Kinesis stream, and an image processing action can be triggered. Lambda functions can also be activated through third-party web services.
 
-有四种方法激活 Lambda 函数：
+There are four ways to activate a Lambda function:
 
--   直接方式，使用 web 服务请求
--   自动方式，回应例如 AWS S3，DynamoDB，Kinesis 或者 Simple Email Service 等产生的事件
--   自动方式，通过 AWS API 网关来处理应用客户端发出的 HTTP 请求 ​
--   定时方式，通过 cron 响应 ​--很像定时器方式
+- Direct way, using web service request
+- Automatically respond to events generated by AWS S3, DynamoDB, Kinesis or Simple Email Service, etc.
+- Automatically handle HTTP requests from application clients through AWS API gateway
+- Timing mode, response via cron --much like timer mode
 
-可以看出，AWS Lambda 是一种很方便部署微服务的方式。基于请求计费方式意味着用户只需要承担处理自己业务那部分的负载；另外，因为不需要了解基础架构，用户只需要开发自己的应用。
+It can be seen that AWS Lambda is a very convenient way to deploy microservices. The request-based billing method means that users only need to bear the load of processing their own business; in addition, because they do not need to understand the infrastructure, users only need to develop their own applications.
 
-然而还是有不少限制。不需要用来部署长期服务，例如用来消费从第三方代理转发来的消息，请求必须在 300 秒内完成，服务必须是无状态，因为理论上 AWS Lambda 会为每个请求生成一个独立的实例；必须用某种支持的语言完成，服务必须启动很快，否则，会因为超时被停止。
-部署微服务应用也是一种挑战。用各种语言和框架写成的服务成百上千。每种服务都是一种迷你应用，有自己独特的部署、资源、扩充和监控需求。有若干种微服务部署模式，包括单虚机单实例以及单容器单实例。另外可选模式还有 AWS Lambda，一种 serverless 方法。
+However, there are still many limitations. It does not need to be used to deploy long-term services, such as to consume messages forwarded from third-party agents, the request must be completed within 300 seconds, and the service must be stateless, because in theory AWS Lambda will generate an independent instance for each request ; must be done in one of the supported languages, and the service must start quickly, otherwise, it will be stopped due to a timeout
+
+Deploying microservice applications is also a challenge. There are hundreds of services written in various languages and frameworks. Each service is a mini-application with its own unique deployment, resource, scaling, and monitoring needs. There are several microservice deployment models, including single-VM single-instance and single-container single-instance. Another optional mode is AWS Lambda, a serverless approach.

@@ -49,7 +49,7 @@ command group 是一个非常重要的概念，默认情况下，就是通过 co
 
 ### command thread pool
 
-ThreadPoolKey 代表了一个 HystrixThreadPool，用来进行统一监控、统计、缓存。默认的 ThreadPoolKey 就是 command group 的名称。每个 command 都会跟它的 ThreadPoolKey 对应的 ThreadPool 绑定在一起。
+ThreadPoolKey 代表了一个 HystrixThreadPool，用来进行统一监控、统计、cache。默认的 ThreadPoolKey 就是 command group 的名称。每个 command 都会跟它的 ThreadPoolKey 对应的 ThreadPool 绑定在一起。
 
 如果不想直接用 command group，也可以手动设置 ThreadPool 的名称。
 
@@ -98,7 +98,7 @@ HystrixThreadPoolProperties.Setter().withCoreSize(int value);
 
 ![hystrix-thread-pool-queue](./images/hystrix-thread-pool-queue.png)
 
-控制 queue 满了之后 reject 的 threshold，因为 maxQueueSize 不允许热修改，因此提供这个参数可以热修改，控制队列的最大大小。
+控制 queue 满了之后 reject target threshold，因为 maxQueueSize 不允许热修改，因此提供这个参数可以热修改，控制队列的最大大小。
 
 ```java
 HystrixThreadPoolProperties.Setter().withQueueSizeRejectionThreshold(int value);

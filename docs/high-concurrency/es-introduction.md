@@ -1,4 +1,4 @@
-## Lucene 和 ES 的前世今生
+## Lucene and ES 的前世今生
 
 Lucene 是最先进、功能最强大的搜索库。如果直接基于 Lucene 开发，非常复杂，即便写一些简单的功能，也要写大量的 Java 代码，需要深入理解原理。
 
@@ -45,7 +45,7 @@ Node 是集群中的一个节点，节点也有一个名称，默认是随机分
 
 ### Type
 
-类型，每个索引里可以有一个或者多个 type，type 是 index 的一个逻辑分类，比如商品 index 下有多个 type：日化商品 type、电器商品 type、生鲜商品 type。每个 type 下的 document 的 field 可能不太一样。
+类型，每个索引里可以有一个或者多个 type，type 是 index 的一个逻辑分类，比如商品 index 下有多个 type：日化商品 type、电器商品 type、生鲜商品 type。每个 type 下的 document target field 可能不太一样。
 
 ### shard
 
@@ -55,7 +55,7 @@ Node 是集群中的一个节点，节点也有一个名称，默认是随机分
 
 任何一个服务器随时可能故障或宕机，此时 shard 可能就会丢失，因此可以为每个 shard 创建多个 replica 副本。replica 可以在 shard 故障时提供备用服务，保证数据不丢失，多个 replica 还可以提升搜索操作的吞吐量和性能。primary shard（建立索引时一次设置，不能修改，默认 5 个），replica shard（随时修改数量，默认 1 个），默认每个索引 10 个 shard，5 个 primary shard，5 个 replica shard，最小的高可用配置，是 2 台服务器。
 
-这么说吧，shard 分为 primary shard 和 replica shard。而 primary shard 一般简称为 shard，而 replica shard 一般简称为 replica。
+这么说吧，shard 分为 primary shard and replica shard。而 primary shard 一般简称为 shard，而 replica shard 一般简称为 replica。
 
 ![es-cluster-0](./images/es-cluster-0.png)
 

@@ -1,14 +1,14 @@
-## 面试题
+## Interview questions
 
-dubbo 的 spi 思想是什么？
+dubbo target spi 思想是什么？
 
-## 面试官心理分析
+## Interviewer psychoanalysis
 
-继续深入问呗，前面一些基础性的东西问完了，确定你应该都 ok，了解 dubbo 的一些基本东西，那么问个稍微难一点点的问题，就是 spi，先问问你 spi 是啥？然后问问你 dubbo 的 spi 是怎么实现的？
+继续深入问呗，前面一些基础性的东西问完了，确定你应该都 ok，了解 dubbo 的一些基本东西，那么问个稍微难一点点的问题，就是 spi，先问问你 spi 是啥？然后问问你 dubbo target spi 是怎么实现的？
 
 其实就是看看你对 dubbo 的掌握如何。
 
-## 面试题剖析
+## Anatomy of an interview question
 
 ### spi 是啥？
 
@@ -30,9 +30,9 @@ Java 定义了一套 jdbc 的接口，但是 Java 并没有提供 jdbc 的实现
 
 在系统跑的时候，碰到你使用 jdbc 的接口，他会在底层使用你引入的那个 jar 中提供的实现类。
 
-### dubbo 的 spi 思想
+### dubbo target spi 思想
 
-dubbo 也用了 spi 思想，不过没有用 jdk 的 spi 机制，是自己实现的一套 spi 机制。
+dubbo 也用了 spi 思想，不过没有用 jdk target spi 机制，是自己实现的一套 spi 机制。
 
 ```java
 Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();
@@ -69,7 +69,7 @@ http=com.alibaba.dubbo.rpc.protocol.http.HttpProtocol
 hessian=com.alibaba.dubbo.rpc.protocol.hessian.HessianProtocol
 ```
 
-所以说，这就看到了 dubbo 的 spi 机制默认是怎么玩儿的了，其实就是 Protocol 接口， `@SPI("dubbo")` 说的是，通过 SPI 机制来提供实现类，实现类是通过 dubbo 作为默认 key 去配置文件里找到的，配置文件名称与接口全限定名一样的，通过 dubbo 作为 key 可以找到默认的实现类就是 `com.alibaba.dubbo.rpc.protocol.dubbo.DubboProtocol` 。
+所以说，这就看到了 dubbo target spi 机制默认是怎么玩儿的了，其实就是 Protocol 接口， `@SPI("dubbo")` 说的是，通过 SPI 机制来提供实现类，实现类是通过 dubbo 作为默认 key 去配置文件里找到的，配置文件名称与接口全限定名一样的，通过 dubbo 作为 key 可以找到默认的实现类就是 `com.alibaba.dubbo.rpc.protocol.dubbo.DubboProtocol` 。
 
 如果想要动态替换掉默认的实现类，需要使用 `@Adaptive` 接口，Protocol 接口中，有两个方法加了 `@Adaptive` 注解，就是说那俩接口会被代理实现。
 

@@ -1,16 +1,16 @@
-## 面试题
+## Interview questions
 
 如何保证消息的可靠性传输？或者说，如何处理消息丢失的问题？
 
-## 面试官心理分析
+## Interviewer psychoanalysis
 
 这个是肯定的，用 MQ 有个基本原则，就是**数据不能多一条，也不能少一条**，不能多，就是前面说的[重复消费和幂等性问题](/docs/high-concurrency/how-to-ensure-that-messages-are-not-repeatedly-consumed.md)。不能少，就是说这数据别搞丢了。那这个问题你必须得考虑一下。
 
 如果说你这个是用 MQ 来传递非常核心的消息，比如说计费、扣费的一些消息，那必须确保这个 MQ 传递过程中**绝对不会把计费消息给弄丢**。
 
-## 面试题剖析
+## Anatomy of an interview question
 
-数据的丢失问题，可能出现在生产者、MQ、消费者中，咱们从 RabbitMQ 和 Kafka 分别来分析一下吧。
+数据的丢失问题，可能出现在生产者、MQ、消费者中，咱们从 RabbitMQ and Kafka 分别来分析一下吧。
 
 ### RabbitMQ
 
@@ -49,7 +49,7 @@ try {
 
 所以一般来说，如果你要确保说写 RabbitMQ 的消息别丢，可以开启 `confirm` 模式，在生产者那里设置开启 `confirm` 模式之后，你每次写的消息都会分配一个唯一的 id，然后如果写入了 RabbitMQ 中，RabbitMQ 会给你回传一个 `ack` 消息，告诉你说这个消息 ok 了。如果 RabbitMQ 没能处理这个消息，会回调你的一个 `nack` 接口，告诉你这个消息接收失败，你可以重试。而且你可以结合这个机制自己在内存里维护每个消息 id 的状态，如果超过一定时间还没接收到这个消息的回调，那么你可以重发。
 
-事务机制和 `confirm` 机制最大的不同在于，**事务机制是同步的**，你提交一个事务之后会**阻塞**在那儿，但是 `confirm` 机制是**异步**的，你发送个消息之后就可以发送下一个消息，然后那个消息 RabbitMQ 接收了之后会异步回调你的一个接口通知你这个消息接收到了。
+事务机制和 `confirm` 机制最大的不同在于，**事务机制是同步的**，你提交一个事务之后会**阻塞**在那儿，但是 `confirm` 机制是**asynchronous**target，你发送个消息之后就可以发送下一个消息，然后那个消息 RabbitMQ 接收了之后会异步回调你的一个接口通知你这个消息接收到了。
 
 所以一般在生产者这块**避免数据丢失**，都是用 `confirm` 机制的。
 
@@ -80,7 +80,7 @@ if (!channel.waitForConfirms()) {
 }
 ```
 
-3.**异步 confirm 模式**：提供一个回调方法，服务端 confirm 了一条或者多条消息后客户端会回调这个方法。
+3.**asynchronous confirm 模式**：提供一个回调方法，服务端 confirm 了一条或者多条消息后客户端会回调这个方法。
 
 ```java
 SortedSet<Long> confirmSet = Collections.synchronizedSortedSet(new TreeSet<Long>());
@@ -123,7 +123,7 @@ while (true) {
 
 必须要同时设置这两个持久化才行，RabbitMQ 哪怕是挂了，再次重启，也会从磁盘上重启恢复 queue，恢复这个 queue 里的数据。
 
-注意，哪怕是你给 RabbitMQ 开启了持久化机制，也有一种可能，就是这个消息写到了 RabbitMQ 中，但是还没来得及持久化到磁盘上，结果不巧，此时 RabbitMQ 挂了，就会导致内存里的一点点数据丢失。
+note，哪怕是你给 RabbitMQ 开启了持久化机制，也有一种可能，就是这个消息写到了 RabbitMQ 中，但是还没来得及持久化到磁盘上，结果不巧，此时 RabbitMQ 挂了，就会导致内存里的一点点数据丢失。
 
 所以，持久化可以跟生产者那边的 `confirm` 机制配合起来，只有消息被持久化到磁盘之后，才会通知生产者 `ack` 了，所以哪怕是在持久化到磁盘之前，RabbitMQ 挂了，数据丢了，生产者收不到 `ack` ，你也是可以自己重发的。
 
@@ -149,9 +149,9 @@ RabbitMQ 如果丢失了数据，主要是因为你消费的时候，**刚消费
 
 #### Kafka 弄丢了数据
 
-这块比较常见的一个场景，就是 Kafka 某个 broker 宕机，然后重新选举 partition 的 leader。大家想想，要是此时其他的 follower 刚好还有些数据没有同步，结果此时 leader 挂了，然后选举某个 follower 成 leader 之后，不就少了一些数据？这就丢了一些数据啊。
+这块比较常见的一个场景，就是 Kafka 某个 broker 宕机，然后重新选举 partition target leader。大家想想，要是此时其他的 follower 刚好还有些数据没有同步，结果此时 leader 挂了，然后选举某个 follower 成 leader 之后，不就少了一些数据？这就丢了一些数据啊。
 
-生产环境也遇到过，我们也是，之前 Kafka 的 leader 机器宕机了，将 follower 切换为 leader 之后，就会发现说这个数据就丢了。
+生产环境也遇到过，我们也是，之前 Kafka target leader 机器宕机了，将 follower 切换为 leader 之后，就会发现说这个数据就丢了。
 
 所以此时一般是要求起码设置如下 4 个参数：
 
@@ -194,7 +194,7 @@ RabbitMQ 如果丢失了数据，主要是因为你消费的时候，**刚消费
 
 Master 节点挂了怎么办？Master 节点挂了之后 DLedger 登场
 
--   接管 MQ 的 commitLog
+-   接管 MQ target commitLog
 -   选举从节点
 -   文件复制 uncommited 状态 多半从节点收到之后改为 commited
 

@@ -1,6 +1,6 @@
 # 高可用架构
 
--   [Hystrix 介绍](./hystrix-introduction.md)
+-   [Hystrix introduce](./hystrix-introduction.md)
 -   [电商网站详情页系统架构](./e-commerce-website-detail-page-architecture.md)
 -   [Hystrix 线程池技术实现资源隔离](./hystrix-thread-pool-isolation.md)
 -   [Hystrix 信号量机制实现资源隔离](./hystrix-semphore-isolation.md)
@@ -32,7 +32,7 @@
 
 ---
 
-## 公众号
+## Official account
 
 [Doocs](https://github.com/doocs) 技术社区旗下唯一公众号「**Doocs**」​，欢迎扫码关注，**专注分享技术领域相关知识及行业最新资讯**。当然，也可以加我个人微信（备注：GitHub），拉你进技术交流群。
 
@@ -53,6 +53,6 @@
   </tr>
 </table>
 
-关注「**Doocs**」公众号，回复 **PDF**，即可获取本项目离线 PDF 文档（283 页精华），学习更加方便！
+关注「**Doocs**」Official account，回复 **PDF**，即可获取本项目离线 PDF 文档（283 页精华），学习更加方便！
 
 <img src="https://cdn-doocs.oss-cn-shenzhen.aliyuncs.com/gh/doocs/advanced-java@main/images/pdf.png" style="width: 600px;"><br>

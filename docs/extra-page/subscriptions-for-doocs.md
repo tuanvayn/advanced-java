@@ -28,14 +28,14 @@ GitHub 开源社区 Doocs 旗下唯一公众号“**Doocs**”，专注于挖掘
 因为刚刚推出公众号，目前有以下几篇文章，来先睹为快吧：
 
 -   [硬核！亿级流量秒杀系统设计](https://mp.weixin.qq.com/s/Mo_knIRBQQL2s-D2aieZLg)
--   [技术面试是否要看面经？面试官/面试者有话说！](https://mp.weixin.qq.com/s/fNiUmbY395rsPdEC0QDIrw)
+-   [技术面试是否要看面经？Interviewer/面试者有话说！](https://mp.weixin.qq.com/s/fNiUmbY395rsPdEC0QDIrw)
 -   [如何破解极验滑动验证码？成功率 100%！](https://mp.weixin.qq.com/s/Fsl6qYN5Dw4s6Du893MkFQ)
 -   [免费且好用的图床，就你了，「图壳」！](https://mp.weixin.qq.com/s/0HhgHLo_tTRFZcC-CVjDbw)
 -   [阿里又一个 20k+ stars 开源项目诞生，恭喜 fastjson！](https://mp.weixin.qq.com/s/RNKDCK2KoyeuMeEs6GUrow)
 -   [刷掉 90% 候选人的互联网大厂海量数据面试题（附题解 + 方法总结）](https://mp.weixin.qq.com/s/rjGqxUvrEqJNlo09GrT1Dw)
 -   [好用！期待已久的文本块功能究竟如何在 Java 13 中发挥作用？](https://mp.weixin.qq.com/s/kalGv5T8AZGxTnLHr2wDsA)
 -   [2019 GitHub 开源贡献排行榜新鲜出炉！微软谷歌领头，阿里跻身前 12！](https://mp.weixin.qq.com/s/_q812aGD1b9QvZ2WFI0Qgw)
--   [Google 搜索的即时自动补全功能究竟是如何“工作”的？](https://mp.weixin.qq.com/s/YlMISSc3Sn890BzTLytcLA)
+-   [Google 搜索的即时自动补全功能究竟是如何“工作”target？](https://mp.weixin.qq.com/s/YlMISSc3Sn890BzTLytcLA)
 -   [厉害了，原来 Redisson 这么好用！](https://mp.weixin.qq.com/s/lpZ7eRdImy0MyTEVH68HYw)
 -   [一文带你搞懂 “缓存策略”](https://mp.weixin.qq.com/s/47A_iXY_nArURwUTPHr2IQ)
 -   [Java Getter/Setter “防坑指南”](https://mp.weixin.qq.com/s/TZqcAw7NTlcvU-p930-eHA)
@@ -49,7 +49,7 @@ GitHub 开源社区 Doocs 旗下唯一公众号“**Doocs**”，专注于挖掘
 
 有的，目前微信群“**Doocs 的技术朋友们**”已经接近 200 号人，如果你希望加入，请通过微信与我联系。
 
-**注意**，群内禁止一切垃圾广告信息，包括小程序助力信息、小游戏、社群推广、公众号推广、支付宝推广码等；交流 GitHub、开发相关，可以自由分享一些开发相关知识，但不提倡整天水群，建议还是多花点时间提升自己。
+**note**，群内禁止一切垃圾广告信息，包括小程序助力信息、小游戏、社群推广、公众号推广、支付宝推广码等；交流 GitHub、开发相关，可以自由分享一些开发相关知识，但不提倡整天水群，建议还是多花点时间提升自己。
 
 <div style="text-align:center; ">
   <img src="./images/wechat-group-for-doocs.png" width="300px; "/>

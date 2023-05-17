@@ -1,8 +1,8 @@
-## 面试题
+## Interview questions
 
 分布式服务接口的幂等性如何设计（比如不能重复扣款）？
 
-## 面试官心理分析
+## Interviewer psychoanalysis
 
 从这个问题开始，面试官就已经进入了**实际的生产问题**的面试了。
 
@@ -14,7 +14,7 @@
 
 所以你肯定得知道这事儿，否则你做出来的分布式系统恐怕容易埋坑。
 
-## 面试题剖析
+## Anatomy of an interview question
 
 这个不是技术问题，这个没有通用的一个方法，这个应该**结合业务**来保证幂等性。
 
@@ -28,4 +28,4 @@
 
 实际运作过程中，你要结合自己的业务来，比如说利用 Redis，用 orderId 作为唯一键。只有成功插入这个支付流水，才可以执行实际的支付扣款。
 
-要求是支付一个订单，必须插入一条支付流水，order_id 建一个唯一键 `unique key` 。你在支付一个订单之前，先插入一条支付流水，order_id 就已经进去了。你就可以写一个标识到 Redis 里面去， `set order_id payed` ，下一次重复请求过来了，先查 Redis 的 order_id 对应的 value，如果是 `payed` 就说明已经支付过了，你就别重复支付了。
+要求是支付一个订单，必须插入一条支付流水，order_id 建一个唯一键 `unique key` 。你在支付一个订单之前，先插入一条支付流水，order_id 就已经进去了。你就可以写一个标识到 Redis 里面去， `set order_id payed` ，下一次重复请求过来了，先查 Redis target order_id 对应的 value，如果是 `payed` 就说明已经支付过了，你就别重复支付了。

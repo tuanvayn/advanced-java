@@ -1,15 +1,15 @@
-## 面试题
+## Interview questions
 
-如何自己设计一个类似 Dubbo 的 RPC 框架？
+如何自己设计一个类似 Dubbo target RPC 框架？
 
-## 面试官心理分析
+## Interviewer psychoanalysis
 
 说实话，就这问题，其实就跟问你如何自己设计一个 MQ 一样的道理，就考两个：
 
 -   你有没有对某个 rpc 框架原理有非常深入的理解。
 -   你能不能从整体上来思考一下，如何设计一个 rpc 框架，考考你的系统设计能力。
 
-## 面试题剖析
+## Anatomy of an interview question
 
 其实问到你这问题，你起码不能认怂，因为是知识的扫盲，那我不可能给你深入讲解什么 kafka 源码剖析，dubbo 源码剖析，何况我就算讲了，你要真的消化理解和吸收，起码个把月以后了。
 

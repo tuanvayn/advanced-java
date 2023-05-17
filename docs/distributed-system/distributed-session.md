@@ -1,14 +1,14 @@
-## 面试题
+## Interview questions
 
 集群部署时的分布式 Session 如何实现？
 
-## 面试官心理分析
+## Interviewer psychoanalysis
 
-面试官问了你一堆 Dubbo 是怎么玩儿的，你会玩儿 Dubbo 就可以把单块系统弄成分布式系统，然后分布式之后接踵而来的就是一堆问题，最大的问题就是**分布式事务**、**接口幂等性**、**分布式锁**，还有最后一个就是**分布式 Session**。
+面试官问了你一堆 Dubbo 是怎么玩儿的，你会玩儿 Dubbo 就可以把单块系统弄成分布式系统，然后分布式之后接踵而来的就是一堆问题，最大的问题就是**Distributed transactions**、**接口幂等性**、**Distributed locks**，还有最后一个就是**分布式 Session**。
 
 当然了，分布式系统中的问题何止这么一点，非常之多，复杂度很高，这里只是说一下常见的几个问题，也是面试的时候常问的几个。
 
-## 面试题剖析
+## Anatomy of an interview question
 
 Session 是啥？浏览器有个 Cookie，在一段时间内这个 Cookie 都存在，然后每次发请求过来都带上一个特殊的 `jsessionid cookie` ，就根据这个东西，在服务端可以维护一个对应的 Session 域，里面可以放点数据。
 
@@ -22,7 +22,7 @@ Session 是啥？浏览器有个 Cookie，在一段时间内这个 Cookie 都存
 
 ### 完全不用 Session
 
-使用 JWT Token 储存用户身份，然后再从数据库或者 cache 中获取其他的信息。这样无论请求分配到哪个服务器都无所谓。
+use JWT Token 储存用户身份，然后再从数据库或者 cache 中获取其他的信息。这样无论请求分配到哪个服务器都无所谓。
 
 ### Tomcat + Redis
 
@@ -40,7 +40,7 @@ Session 是啥？浏览器有个 Cookie，在一段时间内这个 Cookie 都存
          maxInactiveInterval="60"/>
 ```
 
-然后指定 Redis 的 host 和 port 就 ok 了。
+然后指定 Redis target host and port 就 ok 了。
 
 ```xml
 <Valve className="com.orangefunction.tomcat.redissessions.RedisSessionHandlerValve" />
@@ -50,7 +50,7 @@ Session 是啥？浏览器有个 Cookie，在一段时间内这个 Cookie 都存
 	 maxInactiveInterval="60"/>
 ```
 
-还可以用上面这种方式基于 Redis 哨兵支持的 Redis 高可用集群来保存 Session 数据，都是 ok 的。
+还可以用上面这种方式基于 Redis 哨兵支持的 Redis 高可用集群来保存 Session 数据，都是 ok target。
 
 ### Spring Session + Redis
 
@@ -133,6 +133,6 @@ public class TestController {
 }
 ```
 
-上面的代码就是 ok 的，给 Spring Session 配置基于 Redis 来存储 Session 数据，然后配置了一个 Spring Session 的过滤器，这样的话，Session 相关操作都会交给 Spring Session 来管了。接着在代码中，就用原生的 Session 操作，就是直接基于 Spring Session 从 Redis 中获取数据了。
+上面的代码就是 ok target，给 Spring Session 配置基于 Redis 来存储 Session 数据，然后配置了一个 Spring Session 的过滤器，这样的话，Session 相关操作都会交给 Spring Session 来管了。接着在代码中，就用原生的 Session 操作，就是直接基于 Spring Session 从 Redis 中获取数据了。
 
 实现分布式的会话有很多种方式，我说的只不过是比较常见的几种方式，Tomcat + Redis 早期比较常用，但是会重耦合到 Tomcat 中；近些年，通过 Spring Session 来实现。

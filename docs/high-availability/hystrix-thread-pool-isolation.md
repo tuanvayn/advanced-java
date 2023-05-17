@@ -49,7 +49,7 @@ public String getProductInfo(Long productId) {
 
 ### 利用 HystrixObservableCommand 批量获取数据
 
-只要是获取商品数据，全部都绑定到同一个线程池里面去，我们通过 HystrixObservableCommand 的一个线程去执行，而在这个线程里面，批量把多个 productId 的 productInfo 拉回来。
+只要是获取商品数据，全部都绑定到同一个线程池里面去，我们通过 HystrixObservableCommand 的一个线程去执行，而在这个线程里面，批量把多个 productId target productInfo 拉回来。
 
 ```java
 public class GetProductInfosCommand extends HystrixObservableCommand<ProductInfo> {

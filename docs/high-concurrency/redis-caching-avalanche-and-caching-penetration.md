@@ -1,14 +1,14 @@
-## 面试题
+## Interview questions
 
 了解什么是 Redis 的雪崩、穿透和击穿？Redis 崩溃之后会怎么样？系统该如何应对这种情况？如何处理 Redis 的穿透？
 
-## 面试官心理分析
+## Interviewer psychoanalysis
 
 其实这是问到缓存必问的，因为缓存雪崩和穿透，是缓存最大的两个问题，要么不出现，一旦出现就是致命性的问题，所以面试官一定会问你。
 
-## 面试题剖析
+## Anatomy of an interview question
 
-### 缓存雪崩(Cache Avalanche)
+### Cache avalanche(Cache Avalanche)
 
 对于系统 A，假设每天高峰期每秒 5000 个请求，本来缓存在高峰期可以扛住每秒 4000 个请求，但是缓存机器意外发生了全盘宕机。缓存挂了，此时 1 秒 5000 个请求全部落数据库，数据库必然扛不住，它会报一下警，然后就挂了。此时，如果没有采用什么特别的方案来处理这个故障，DBA 很着急，重启数据库，但是数据库立马又被新的流量给打死了。
 
@@ -21,12 +21,12 @@
 缓存雪崩的事前事中事后的解决方案如下：
 
 -   事前：Redis 高可用，主从+哨兵，Redis cluster，避免全盘崩溃。
--   事中：本地 ehcache 缓存 + hystrix 限流&降级，避免 MySQL 被打死。
+-   事中：本地 ehcache cache + hystrix 限流&降级，避免 MySQL 被打死。
 -   事后：Redis 持久化，一旦重启，自动从磁盘上加载数据，快速恢复缓存数据。
 
 ![redis-caching-avalanche-solution](./images/redis-caching-avalanche-solution.png)
 
-用户发送一个请求，系统 A 收到请求后，先查本地 ehcache 缓存，如果没查到再查 Redis。如果 ehcache 和 Redis 都没有，再查数据库，将数据库中的结果，写入 ehcache 和 Redis 中。
+用户发送一个请求，系统 A 收到请求后，先查本地 ehcache cache，如果没查到再查 Redis。如果 ehcache and Redis 都没有，再查数据库，将数据库中的结果，写入 ehcache and Redis 中。
 
 限流组件，可以设置每秒的请求，有多少能通过组件，剩余的未通过的请求，怎么办？**走降级**！可以返回一些默认的值，或者友情提示，或者空值。
 
@@ -36,7 +36,7 @@
 -   只要数据库不死，就是说，对用户来说，2/5 的请求都是可以被处理的。
 -   只要有 2/5 的请求可以被处理，就意味着你的系统没死，对用户来说，可能就是点击几次刷不出来页面，但是多点几次，就可以刷出来了。
 
-### 缓存穿透(Cache Penetration)
+### Cache walkthrough(Cache Penetration)
 
 对于系统 A，假设一秒 5000 个请求，结果其中 4000 个请求是黑客发出的恶意攻击。
 
@@ -57,9 +57,9 @@
 
 ![redis-caching-avoid-penetration](./images/redis-caching-avoid-penetration.png)
 
-### 缓存击穿(Hotspot Invalid)
+### Cache breakdown(Hotspot Invalid)
 
-缓存击穿，就是说某个 key 非常热点，访问非常频繁，处于集中式高并发访问的情况，当这个 key 在失效的瞬间，大量的请求就击穿了缓存，直接请求数据库，就像是在一道屏障上凿开了一个洞。
+Cache breakdown，就是说某个 key 非常热点，访问非常频繁，处于集中式高并发访问的情况，当这个 key 在失效的瞬间，大量的请求就击穿了缓存，直接请求数据库，就像是在一道屏障上凿开了一个洞。
 
 不同场景下的解决方式可如下：
 

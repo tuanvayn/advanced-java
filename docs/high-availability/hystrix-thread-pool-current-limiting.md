@@ -1,6 +1,6 @@
 ## 深入 Hystrix 线程池隔离与接口限流
 
-前面讲了 Hystrix 的 request cache 请求缓存、fallback 优雅降级、circuit breaker 断路器快速熔断，这一讲，我们来详细说说 Hystrix 的线程池隔离与接口限流。
+前面讲了 Hystrix target request cache 请求缓存、fallback 优雅降级、circuit breaker 断路器快速熔断，这一讲，我们来详细说说 Hystrix 的线程池隔离与接口限流。
 
 ![hystrix-process](./images/hystrix-process.png)
 
@@ -56,7 +56,7 @@ Hystrix 对每个外部依赖用一个单独的线程池，这样的话，如果
 
 semaphore 技术可以用来限流和削峰，但是不能用来对调用延迟的服务进行 timeout 和隔离。
 
-`execution.isolation.strategy` 设置为 `SEMAPHORE`，那么 Hystrix 就会用 semaphore 机制来替代线程池机制，来对依赖服务的访问进行限流。如果通过 semaphore 调用的时候，底层的网络调用延迟很严重，那么是无法 timeout 的，只能一直 block 住。一旦请求数量超过了 semaphore 限定的数量之后，就会立即开启限流。
+`execution.isolation.strategy` 设置为 `SEMAPHORE`，那么 Hystrix 就会用 semaphore 机制来替代线程池机制，来对依赖服务的访问进行限流。如果通过 semaphore 调用的时候，底层的网络调用延迟很严重，那么是无法 timeout target，只能一直 block 住。一旦请求数量超过了 semaphore 限定的数量之后，就会立即开启限流。
 
 ### 接口限流 Demo
 

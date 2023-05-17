@@ -1,58 +1,58 @@
-# 微服务技术栈
+# Microservices technology stack
 
-## 技术栈
+## Technology stack
 
-### 微服务开发
+### Microservices development
 
-作用：快速开发服务。
+Role: Rapid development of services.
 
 -   Spring
 -   Spring MVC
 -   Spring Boot
 
-[Spring](https://spring.io/) 目前是 JavaWeb 开发人员必不可少的一个框架，SpringBoot 简化了 Spring 开发的配置目前也是业内主流开发框架。
+[Spring](https://spring.io/) Currently an essential framework for Java Web developers, SpringBoot simplifies the configuration of Spring development and is now the mainstream development framework in the industry.
 
-### 微服务注册发现
+### Microservices registration discovery
 
-作用：发现服务，注册服务，集中管理服务。
+Role: Discovery service, registration service, centralized management service.
 
 #### Eureka
 
--   Eureka Server : 提供服务注册服务, 各个节点启动后，会在 Eureka Server 中进行注册。
--   Eureka Client : 简化与 Eureka Server 的交互操作。
--   Spring Cloud Netflix : [GitHub](https://github.com/spring-cloud/spring-cloud-netflix)，[文档](https://cloud.spring.io/spring-cloud-netflix/reference/html/)
+-   Eureka Server : The service registration service is provided, and after each node is started, it is registered in the Eureka Server.
+-   Eureka Client : Simplify interaction with Eureka Server.
+-   Spring Cloud Netflix : [GitHub](https://github.com/spring-cloud/spring-cloud-netflix)，[documentation](https://cloud.spring.io/spring-cloud-netflix/reference/html/)
 
 #### Zookeeper
 
 > ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services.
 
-[Zookeeper](https://github.com/apache/zookeeper) 是一个集中的服务, 用于维护配置信息、命名、提供分布式同步和提供组服务。
+[Zookeeper](https://github.com/apache/zookeeper) is a centralized service that maintains configuration information, naming, provides distributed synchronization, and provides group services.
 
-#### Zookeeper 和 Eureka 区别
+#### The difference between Zookeeper and Eureka
 
-Zookeeper 保证 CP，Eureka 保证 AP：
+Zookeeper guarantees CP, Eureka guarantees AP:
 
--   C：数据一致性；
--   A：服务可用性；
--   P：服务对网络分区故障的容错性，这三个特性在任何分布式系统中不能同时满足，最多同时满足两个。
+-   C: Data consistency;
+-   A: Service availability;
+-   P: The fault tolerance of the service to network partition failures, these three characteristics cannot be met at the same time in any distributed system, at most two at the same time.
 
-### 微服务配置管理
+### Microservices configuration management
 
-作用：统一管理一个或多个服务的配置信息, 集中管理。
+Function: Unified management of configuration information of one or more services, centralized management.
 
 #### [Disconf](https://github.com/knightliao/disconf)
 
-Distributed Configuration Management Platform(分布式配置管理平台) , 它是专注于各种分布式系统配置管理 的通用组件/通用平台, 提供统一的配置管理服务, 是一套完整的基于 zookeeper 的分布式配置统一解决方案。
+Distributed Configuration Management Platform (distributed configuration management platform), which is a common component platform focusing on the configuration management of various distributed systems, provides unified configuration management services, and is a complete set of distributed configuration unified solutions based on zookeeper.
 
 #### [SpringCloudConfig](https://github.com/spring-cloud/spring-cloud-config)
 
 #### [Apollo](https://github.com/ctripcorp/apollo)
 
-Apollo（阿波罗）是携程框架部门研发的分布式配置中心，能够集中化管理应用不同环境、不同集群的配置，配置修改后能够实时推送到应用端，并且具备规范的权限、流程治理等特性，用于微服务配置管理场景。
+Apollo is a distributed configuration center developed by Ctrip's framework department, which can centrally manage the configuration of different environments and clusters of applications, and can be pushed to the application side in real time after configuration modification, and has standardized permissions, process governance and other characteristics for microservice configuration management scenarios.
 
-### 权限认证
+### Permission authentication
 
-作用：根据系统设置的安全规则或者安全策略, 用户可以访问而且只能访问自己被授权的资源，不多不少。
+Function: According to the security rules or security policies set by the system, users can access and only access their authorized resources, no more, no less
 
 #### [Spring Security](https://spring.io/projects/spring-security)
 
@@ -60,53 +60,53 @@ Apollo（阿波罗）是携程框架部门研发的分布式配置中心，能�
 
 > Apache Shiro™ is a powerful and easy-to-use Java security framework that performs authentication, authorization, cryptography, and session management. With Shiro’s easy-to-understand API, you can quickly and easily secure any application – from the smallest mobile applications to the largest web and enterprise applications.
 
-### 批处理
+### Batch processing
 
-作用: 批量处理同类型数据或事物
+What it does: Batch process data or things of the same type
 
 #### [Spring Batch](https://spring.io/projects/spring-batch)
 
-### 定时任务
+### Timed tasks
 
-> 作用: 定时做什么。
+> What it does: What to do regularly.
 
 #### [Quartz](http://www.quartz-scheduler.org/)
 
-### 微服务调用 (协议)
+### Microservice invocation (protocol)
 
-> 通讯协议
+> Communication protocol
 
 #### Rest
 
--   通过 HTTP/HTTPS 发送 Rest 请求进行数据交互
+-   Send REST requests over HTTP/HTTPS for data interaction
 
 #### RPC
 
 -   Remote Procedure Call
--   它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。RPC 不依赖于具体的网络传输协议，tcp、udp 等都可以。
+-   It is a protocol that requests services from remote computer programs over a network without requiring knowledge of the underlying network technology. RPC does not depend on specific network transport protocols, TCP, UDP, etc. can be.
 
 #### [gRPC](https://www.grpc.io/)
 
 > A high-performance, open-source universal RPC framework
 
-所谓 RPC(remote procedure call 远程过程调用) 框架实际是提供了一套机制，使得应用程序之间可以进行通信，而且也遵从 server/client 模型。使用的时候客户端调用 server 端提供的接口就像是调用本地的函数一样。
+The so-called RPC (Remote Procedure Call) framework actually provides a mechanism for applications to communicate with each other, and also follows the serverclient model. When used, the client calls the interface provided by the server as if it were calling a local function.
 
 #### RMI
 
 -   Remote Method Invocation
--   纯 Java 调用
+-   Pure Java calls
 
-### 服务接口调用
+### Service interface call
 
-> 作用：多个服务之间的通讯
+> Role: Communication between multiple services
 
 #### [Feign(HTTP)](https://github.com/OpenFeign/feign)
 
-Spring Cloud Netflix 的微服务都是以 HTTP 接口的形式暴露的，所以可以用 Apache 的 HttpClient 或 Spring 的 RestTemplate 去调用，而 Feign 是一个使用起来更加方便的 HTTP 客戶端，使用起来就像是调用自身工程的方法，而感觉不到是调用远程方法。
+Spring Cloud Netflix's microservices are exposed in the form of HTTP interfaces, so they can be called with Apache's HttpClient or Spring's RestTemplate, and Feign is a more convenient HTTP client to use, using it like calling its own engineering methods, without feeling like calling remote methods.
 
-### 服务熔断
+### Service circuit breaker
 
-> 作用: 当请求到达一定阈值时不让请求继续.
+> What it does: Do not allow the request to continue when it reaches a certain threshold.
 
 #### [Hystrix](https://github.com/Netflix/Hystrix)
 
@@ -114,27 +114,27 @@ Spring Cloud Netflix 的微服务都是以 HTTP 接口的形式暴露的，所�
 
 #### [Sentinel](https://github.com/alibaba/Sentinel)
 
-> A lightweight powerful flow control component enabling reliability and monitoring for microservices. (轻量级的流量控制、熔断降级 Java 库)
+> A lightweight powerful flow control component enabling reliability and monitoring for microservices. (Lightweight flow control、Circuit breaker downgrades Java libraries)
 
-### 服务的负载均衡
+### Load balancing for services
 
-> 作用：降低服务压力, 增加吞吐量
+> Function: Reduce service pressure and increase throughput
 
 #### [Ribbon](https://github.com/Netflix/ribbon)
 
-> Spring Cloud Ribbon 是一个基于 HTTP 和 TCP 的客户端负载均衡工具, 它基于 Netflix Ribbon 实现
+> Spring Cloud Ribbon is a client-side load balancing tool based on HTTP and TCP that is based on the Netflix Ribbon
 
 #### [Nginx](https://github.com/nginx/nginx)
 
-Nginx (engine x) 是一个高性能的 HTTP 和反向代理 web 服务器, 同时也提供了 IMAP/POP3/SMTP 服务
+Nginx (engine x) is a high-performance http and reverse proxy web server that also provides IMAP/POP3/SMTP services
 
-#### Nginx 与 Ribbon 区别
+#### Nginx is different from ribbon
 
-Nginx 属于服务端负载均衡，Ribbon 属于客户端负载均衡。Nginx 作用与 Tomcat，Ribbon 作用与各个服务之间的调用 (RPC)。
+Nginx belongs to server-side load balancing, and ribbon belongs to client-side load balancing. Nginx acts with Tomcat, and Ribbon acts with calls between individual services (RPC).
 
-### 消息队列
+### Message Queuing
 
-> 作用: 解耦业务, 异步化处理数据
+> Function: Decouple the business and process data asynchronously
 
 #### [Kafka](http://kafka.apache.org/)
 
@@ -144,9 +144,9 @@ Nginx 属于服务端负载均衡，Ribbon 属于客户端负载均衡。Nginx �
 
 #### [activeMQ](http://activemq.apache.org/)
 
-### 日志采集 (elk)
+### Log collection (elk)
 
-> 作用: 收集各服务日志提供日志分析、用户画像等
+> Function: Collects the logs of each service to provide log analysis and user portraits
 
 #### [Elasticsearch](https://github.com/elastic/elasticsearch)
 
@@ -154,17 +154,17 @@ Nginx 属于服务端负载均衡，Ribbon 属于客户端负载均衡。Nginx �
 
 #### [Kibana](https://github.com/elastic/kibana)
 
-### API 网关
+### API gateway
 
-> 作用: 外部请求通过 API 网关进行拦截处理, 再转发到真正的服务
+> Function: External requests are intercepted through API Gateway and forwarded to the real service
 
 #### [Zuul](https://github.com/Netflix/zuul)
 
 > Zuul is a gateway service that provides dynamic routing, monitoring, resiliency, security, and more.
 
-### 服务监控
+### Service monitoring
 
-> 作用: 以可视化或非可视化的形式展示出各个服务的运行情况 (CPU、内存、访问量等)
+> Function: Display the operation status of each service (CPU, memory, access, etc.) in a visual or non-visual form
 
 #### [Zabbix](https://github.com/jjmartres/Zabbix)
 
@@ -172,19 +172,19 @@ Nginx 属于服务端负载均衡，Ribbon 属于客户端负载均衡。Nginx �
 
 #### [Metrics](https://metrics.dropwizard.io)
 
-### 服务链路追踪
+### Service link tracing
 
-> 作用: 明确服务之间的调用关系
+> Role: Clarify the call relationship between services
 
 #### [Zipkin](https://github.com/openzipkin/zipkin)
 
 #### [Brave](https://github.com/openzipkin/brave)
 
-### 数据存储
+### Data storage
 
-> 作用: 存储数据
+> What it does: Stores data
 
-#### 关系型数据库
+#### Relational databases
 
 ##### [MySql](https://www.mysql.com/)
 
@@ -194,29 +194,29 @@ Nginx 属于服务端负载均衡，Ribbon 属于客户端负载均衡。Nginx �
 
 ##### [PostgreSql](https://www.postgresql.org/)
 
-#### 非关系型数据库
+#### Non-relational databases
 
 ##### [Mongodb](https://www.mongodb.com/)
 
 ##### [Elasticsearch](https://github.com/elastic/elasticsearch)
 
-### 缓存
+### cache
 
-> 作用: 存储数据
+> What it does: Stores data
 
 #### [redis](https://redis.io/)
 
-### 分库分表
+### Partition databases and tables
 
-> 作用: 数据库分库分表方案.
+> Function: Database database sharding and table sharding scheme.
 
 #### [ShardingSphere](http://shardingsphere.apache.org/)
 
 #### [Mycat](http://www.mycat.io/)
 
-### 服务部署
+### Service deployment
 
-> 作用: 将项目快速部署、上线、持续集成.
+> Role: Quickly deploy, go online, and continuously integrate the project.
 
 #### [Docker](http://www.docker.com/)
 

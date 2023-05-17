@@ -1,125 +1,125 @@
-# 微服务治理策略
+# Microservice Governance Strategy
 
-## 服务的注册和发现
+## Service Registration and Discovery
 
-解决问题：集中管理服务
+Problem Solving: Centrally Managed Services
 
-解决方法：
+Solution：
 
 -   Eureka
 -   Zookeeper
 
-## 负载均衡
+## load balancing
 
-解决问题：降低服务器硬件压力
+Problem Solving：Reduce server hardware pressure
 
-解决方法：
+Solution：
 
 -   Nginx
 -   Ribbon
 
 ## 通讯
 
-解决问题：各个服务之间的沟通桥梁
+Problem Solving：Communication bridge between various services
 
-解决方法：
+Solution：
 
--   REST（同步）
--   RPC（同步）
--   MQ（异步）
+-   REST（Synchronize）
+-   RPC（Synchronize）
+-   MQ（asynchronousp）
 
-## 配置管理
+## configuration management
 
-解决问题：随着服务的增加配置也在增加，如何管理各个服务的配置。
+Problem Solving： With the increase of services, the configuration is also increasing, how to manage the configuration of each service.
 
-解决方法：
+Solution：
 
 -   Nacos
 -   Spring Cloud Config
 -   Apollo
 
-## 容错和服务降级
+## Fault tolerance and service degradation
 
-解决问题：在微服务当中，一个请求经常会涉及到调用几个服务，如果其中某个服务不可以，没有做服务容错的话，极有可能会造成一连串的服务不可用，这就是雪崩效应。
+Problem Solving：In microservices, a request often involves invoking several services. If one of the services fails and there is no service fault tolerance, it is very likely that a series of services will be unavailable. This is the avalanche effect.
 
-解决方法：
+Solution：
 
 -   Hystrix
 
-## 服务依赖关系
+## service dependencies
 
-解决问题：多个服务之间来回依赖，启动关系的不明确。
+Problem Solving：Multiple services rely back and forth, and the startup relationship is not clear.
 
-解决方法：应用分层。
+Solution：Apply layers.
 
-## 服务文档
+## service documentation
 
-解决问题：降低沟通成本
+Problem Solving：Reduce communication costs
 
-解决方法：
+Solution：
 
 -   Swagger
 -   Java doc
 
-## 服务安全问题
+## Service Security Issues
 
-解决问题：敏感数据的安全性
+Problem Solving：Security of Sensitive Data
 
-解决方法：
+Solution：
 
 -   Oauth
 -   Shiro
 -   Spring Security
 
-## 流量控制
+## flow control
 
-解决问题：避免一个服务上的流量过大拖垮整个服务体系
+Problem Solving：Avoid excessive traffic on one service from dragging down the entire service system
 
-解决方法：
+Solution：
 
 -   Hystrix
 
-## 自动化测试
+## automated test
 
-解决问题：提前预知异常，确定服务是否可用
+Problem Solving： Predict abnormalities in advance to determine whether services are available
 
-解决方法：
+Solution：
 
 -   junit
 
-## 服务上线，下线的流程
+## Service online and offline process
 
-解决问题：避免服务随意的上线下线
+Problem Solving： Avoid random online and offline services
 
-解决方法：新服务上线需要经过管理人员审核，服务下线需要告知各个调用方进行修改，直到没有调用该服务才可以进行下线。
+Solution： When a new service goes online, it needs to be reviewed by the management personnel. When the service goes offline, it needs to notify each caller to make modifications. The service can not be offline until the service is not called.
 
-## 兼容性
+## compatibility
 
-解决问题：服务开发持续进行如何做到兼容。
+Problem Solving：How to achieve compatibility in continuous service development.
 
-解决方法：通过版本号的形式进行管理，修改完成进行回归测试。
+Solution：It is managed in the form of version number, and the modification is completed for regression testing.
 
-## 服务编排
+## service orchestration
 
-解决问题：解决服务依赖问题的一种方式
+Problem Solving：A way to solve the service dependency problem
 
-解决方法：
+Solution：
 
 -   Docker
 -   K8s
 
-## 资源调度
+## Resource Scheduling
 
-解决问题：每个服务的资源占用量不同，如何分配
+Problem Solving：The resource usage of each service is different, how to allocate
 
-解决方法：
+Solution：
 
--   JVM 隔离
--   Classload 隔离
--   硬件隔离
+-   JVM isolation
+-   Classload isolation
+-   hardware isolation
 
-## 容量规划
+## capacity planning
 
-解决问题：随着时间增长，调用逐步增加，什么时候追加机器。
+Problem Solving：As time grows, calls gradually increase, when to add machines.
 
-解决方法：统计每日调用量和响应时间，根据机器情况设置阈值，超过阈值就可以追加机器。
+Solution：Count the daily call volume and response time, set the threshold according to the machine condition, and add the machine if the threshold is exceeded.

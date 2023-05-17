@@ -1,110 +1,110 @@
-# 1.1 微服务和分布式数据管理问题
+# 1.1 Microservices and Distributed Data Management Issues
 
-单体式应用一般都会有一个关系型数据库，由此带来的好处是应用可以使用 ACID transactions，可以带来一些重要的操作特性：
+Monolithic applications generally have a relational database. The benefit of this is that the application can use ACID transactions, which can bring some important operational features:
 
-1. 原子性 – 任何改变都是原子性的
-2. 一致性 – 数据库状态一直是一致性的
-3. 隔离性 – 即使交易并发执行，看起来也是串行的
-4. Durable – 一旦交易提交了就不可回滚
+1. Atomicity - any change is atomic
+2. Consistency - the database state is always consistent
+3. Isolation - Even though transactions execute concurrently, they appear to be serial
+4. Durable – once a transaction is committed it cannot be rolled back
 
-鉴于以上特性，应用可以简化为：开始一个交易，改变（插入，删除，更新）很多行，然后提交这些交易。
+Given the above characteristics, the application can be simplified as: start a transaction, change (insert, delete, update) many rows, and then commit these transactions.
 
-使用关系型数据库带来另外一个优势在于提供 SQL（功能强大，可声明的，表转化的查询语言）支持。用户可以非常容易通过查询将多个表的数据组合起来，RDBMS 查询调度器决定最佳实现方式，用户不需要担心例如如何访问数据库等底层问题。另外，因为所有应用的数据都在一个数据库中，很容易去查询。
+Another advantage of using a relational database is that it provides SQL (a powerful, declarative, table-transformed query language) support. Users can easily combine the data of multiple tables through queries, and the RDBMS query scheduler determines the best implementation method, and users do not need to worry about underlying issues such as how to access the database. In addition, because all application data is in one database, it is easy to query.
 
-然而，对于微服务架构来说，数据访问变得非常复杂，这是因为数据都是微服务私有的，唯一可访问的方式就是通过 API。这种打包数据访问方式使得微服务之间松耦合，并且彼此之间独立。如果多个服务访问同一个数据，schema 会更新访问时间，并在所有服务之间进行协调。
+However, with a microservice architecture, data access becomes very complicated because the data is private to the microservice and the only way it can be accessed is through the API. This packaged data access method makes microservices loosely coupled and independent of each other. If multiple services access the same data, the schema updates access times and coordinates between all services.
 
-更甚于，不同的微服务经常使用不同的数据库。应用会产生各种不同数据，关系型数据库并不一定是最佳选择。某些场景，某个 NoSQL 数据库可能提供更方便的数据模型，提供更加的性能和可扩展性。例如，某个产生和查询字符串的应用采用例如 Elasticsearch 的字符搜索引擎。同样的，某个产生社交图片数据的应用可以采用图片数据库，例如，Neo4j ；因此，基于微服务的应用一般都使用 SQL 和 NoSQL 结合的数据库，也就是被称为 polyglot persistence 的方法。
+What's more, different microservices often use different databases. Applications generate a variety of data, and relational databases are not necessarily the best choice. In some scenarios, a NoSQL database may provide a more convenient data model, providing better performance and scalability. For example, an application that generates and queries strings employs a character search engine such as Elasticsearch. Similarly, an application that generates social image data can use an image database, for example, Neo4j; therefore, microservice-based applications generally use a database that combines SQL and NoSQL, which is a method called polyglot persistence.
 
-分区的，polyglot-persistent 架构用于存储数据有许多优势，包括松耦合服务和更佳性能和可扩展性。然而，随之而来的则是分布式数据管理带来的挑战。
+Partitioned, polyglot-persistent architectures for storing data have many advantages, including loosely coupled services and better performance and scalability. However, with that comes the challenge of distributed data management.
 
-第一个挑战在于如何完成一笔交易的同时保持多个服务之间数据一致性。之所以会有这个问题，我们以一个在线 B2B 商店为例，客户服务维护包括客户的各种信息，例如 credit lines 。订单服务管理订单，需要验证某个新订单与客户的信用限制没有冲突。在单一式应用中，订单服务只需要使用 ACID 交易就可以检查可用信用和创建订单。
+The first challenge is how to complete a transaction while maintaining data consistency among multiple services. The reason for this problem is that we take an online B2B store as an example. Customer service maintenance includes various information of customers, such as credit lines. The order service manages orders and needs to verify that a new order does not violate the customer's credit limit. In a monolithic application, the order service only needs to use ACID transactions to check available credit and create an order.
 
-相反的，微服务架构下，订单和客户表分别是相对应服务的私有表，如下图所示：
+On the contrary, under the microservice architecture, the order and customer tables are private tables of the corresponding services, as shown in the following figure:
 
 ![service table](./images/Private-table-of-the-corresponding-service.png)
 
-订单服务不能直接访问客户表，只能通过客户服务发布的 API 来访问。订单服务也可以使用 distributed transactions, 也就是周知的两阶段提交 (2PC)。然而，2PC 在现在应用中不是可选性。根据 CAP 理论，必须在可用性（availability）和 ACID 一致性（consistency）之间做出选择，availability 一般是更好的选择。但是，许多现代科技，例如许多 NoSQL 数据库，并不支持 2PC。在服务和数据库之间维护数据一致性是非常根本的需求，因此我们需要找其他的方案。
+The order service cannot directly access the customer table, it can only be accessed through the API published by the customer service. The order service can also use distributed transactions, also known as two-phase commit (2PC). However, 2PC is not optional in current applications. According to CAP theory, a choice must be made between availability and ACID consistency, and availability is generally the better choice. However, many modern technologies, such as many NoSQL databases, do not support 2PC. Maintaining data consistency between services and databases is a very fundamental requirement, so we need to find other solutions.
 
-第二个挑战是如何完成从多个服务中搜索数据。例如，设想应用需要显示客户和他的订单。如果订单服务提供 API 来接受用户订单信息，那么用户可以使用类应用型的 join 操作接收数据。应用从用户服务接受用户信息，从订单服务接受此用户订单。假设，订单服务只支持通过私有键（key）来查询订单（也许是在使用只支持基于主键接受的 NoSQL 数据库），此时，没有合适的方法来接收所需数据。
+The second challenge is how to accomplish searching data from multiple services. For example, imagine an application that needs to display a customer and his orders. If the order service provides an API to accept user order information, then the user can use the application-like join operation to receive the data. The application accepts user information from the user service, and accepts the user's order from the order service. Assuming that the order service only supports querying orders by private key (perhaps using a NoSQL database that only supports acceptance based on primary key), at this time, there is no suitable method to receive the required data.
 
-# 1.2 事件驱动架构
+# 1.2 event-driven architecture
 
-对许多应用来说，这个解决方案就是使用事件驱动架构（event-driven architecture）。在这种架构中，当某件重要事情发生时，微服务会发布一个事件，例如更新一个业务实体。当订阅这些事件的微服务接收此事件时，就可以更新自己的业务实体，也可能会引发更多的事件发布。
+For many applications, the solution is to use an event-driven architecture. In this architecture, a microservice publishes an event when something important happens, such as updating a business entity. When the microservices that subscribe to these events receive this event, they can update their own business entities, and may also trigger more event publications.
 
-可以使用事件来实现跨多服务的业务交易。交易一般由一系列步骤构成，每一步骤都由一个更新业务实体的微服务和发布激活下一步骤的事件构成。下图展现如何使用事件驱动方法，在创建订单时检查信用可用度，微服务通过消息代理（Messsage Broker）来交换事件。
+Events can be used to implement business transactions across multiple services. Transactions generally consist of a series of steps, each of which consists of a microservice that updates a business entity and publishes an event that activates the next step. The figure below shows how to use the event-driven approach to check credit availability when creating an order, and the microservices exchange events through the Message Broker (Messsage Broker).
 
-1. 订单服务创建一个带有 NEW 状态的 Order （订单），发布了一个 “Order Created Event（创建订单）” 的事件。
+1. The order service creates an Order with NEW status and publishes an "Order Created Event" event.
 
 ![Order-Created-Event](./images/Order-Created-Event.png)
 
-2. 客户服务消费 Order Created Event 事件，为此订单预留信用，发布 “Credit Reserved Event（信用预留）” 事件。
+2. Customer service consumes the Order Created Event, reserves credit for this order, and publishes a "Credit Reserved Event" event.
 
 ![Credit-Reserved-Event](./images/Credit-Reserved-Event.png)
 
-3. 订单服务消费 Credit Reserved Event ，改变订单的状态为 OPEN。
+3. The order service consumes the Credit Reserved Event and changes the status of the order to OPEN.
 
 ![Status-is-OPEN](./images/Status-is-OPEN.png)
 
-更复杂的场景可以引入更多步骤，例如在检查用户信用的同时预留库存等。
+More complex scenarios can introduce more steps, such as reserving inventory while checking user credit, etc.
 
-考虑到（a）每个服务原子性更新数据库和发布事件，然后，（b）消息代理确保事件传递至少一次，然后可以跨多个服务完成业务交易（此交易不是 ACID 交易）。这种模式提供弱确定性，例如最终一致性 eventual consistency。这种交易类型被称作 BASE model。
+Considering that (a) each service atomically updates the database and publishes events, then, (b) the message broker ensures that the event is delivered at least once, then a business transaction can be done across multiple services (this transaction is not an ACID transaction). This mode provides weak certainty, such as eventual consistency. This type of transaction is called the BASE model.
 
-亦可以使用事件来维护不同微服务拥有数据预连接（pre-join）的实现视图。维护此视图的服务订阅相关事件并且更新视图。例如，客户订单视图更新服务（维护客户订单视图）会订阅由客户服务和订单服务发布的事件。
+Events can also be used to maintain an implementation view of different microservices having data pre-joined. The service maintaining this view subscribes to relevant events and updates the view. For example, the customer order view update service (maintaining the customer order view) subscribes to events published by the customer service and order services.
 
 ![pre-join](./images/pre-join.png)
 
-当客户订单视图更新服务收到客户或者订单事件，就会更新 客户订单视图数据集。可以使用文档数据库（例如 MongoDB）来实现客户订单视图，为每个用户存储一个文档。客户订单视图查询服务负责响应对客户以及最近订单（通过查询客户订单视图数据集）的查询。
+When the customer order view update service receives customer or order events, it updates the customer order view dataset. The customer order view can be implemented using a document database such as MongoDB, storing one document per user. The customer order view query service is responsible for responding to queries for customers and recent orders (by querying the customer order view dataset).
 
-事件驱动架构也是既有优点也有缺点，此架构可以使得交易跨多个服务且提供最终一致性，并且可以使应用维护最终视图；而缺点在于编程模式比 ACID 交易模式更加复杂：为了从应用层级失效中恢复，还需要完成补偿性交易，例如，如果信用检查不成功则必须取消订单；另外，应用必须应对不一致的数据，这是因为临时（in-flight）交易造成的改变是可见的，另外当应用读取未更新的最终视图时也会遇见数据不一致问题。另外一个缺点在于订阅者必须检测和忽略冗余事件。
+The event-driven architecture also has both advantages and disadvantages. This architecture can make transactions span multiple services and provide final consistency, and can enable applications to maintain the final view; the disadvantage is that the programming model is more complicated than the ACID transaction model: in order to invalidate from the application level In recovery, compensating transactions also need to be completed, for example, the order must be canceled if the credit check is unsuccessful; in addition, the application must deal with inconsistent data, because changes caused by temporary (in-flight) transactions are visible, and when Applications can also encounter data inconsistencies when reading final views that are not updated. Another disadvantage is that subscribers must detect and ignore redundant events.
 
-# 1.3 原子操作 Achieving Atomicity
+# 1.3 Atomic Operations Achieving Atomicity
 
-事件驱动架构还会碰到数据库更新和发布事件原子性问题。例如，订单服务必须向 ORDER 表插入一行，然后发布 Order Created event，这两个操作需要原子性。如果更新数据库后，服务瘫了（crashes）造成事件未能发布，系统变成不一致状态。确保原子操作的标准方式是使用一个分布式交易，其中包括数据库和消息代理。然而，基于以上描述的 CAP 理论，这却并不是我们想要的。
+Event-driven architectures also run into issues of atomicity of database updates and publishing events. For example, an order service must insert a row into the ORDER table and then publish an Order Created event, both operations need to be atomic. If after updating the database, the service crashes (crashes) and causes the event to fail to be published, the system becomes inconsistent. The standard way to ensure atomic operations is to use a distributed transaction involving the database and message broker. However, based on the CAP theory described above, this is not what we want.
 
-## 1.3.1 使用本地交易发布事件
+## 1.3.1 Publish events using local transactions
 
-获得原子性的一个方法是对发布事件应用采用 multi-step process involving only local transactions，技巧在于一个 EVENT 表，此表在存储业务实体数据库中起到消息列表功能。应用发起一个（本地）数据库交易，更新业务实体状态，向 EVENT 表中插入一个事件，然后提交此次交易。另外一个独立应用进程或者线程查询此 EVENT 表，向消息代理发布事件，然后使用本地交易标志此事件为已发布，如下图所示：
+One way to achieve atomicity is to apply a multi-step process involving only local transactions for publishing events. The trick is an EVENT table that functions as a list of messages in the database storing the business entities. The application initiates a (local) database transaction, updates the business entity state, inserts an event into the EVENT table, and commits the transaction. Another independent application process or thread queries the EVENT table, publishes the event to the message broker, and then uses the local transaction to mark the event as published, as shown in the following figure:
 
 ![multi-step process](./images/multi-step-process.png)
 
-订单服务向 ORDER 表插入一行，然后向 EVENT 表中插入 Order Created event，事件发布线程或者进程查询 EVENT 表，请求未发布事件，发布他们，然后更新 EVENT 表标志此事件为已发布。
+The order service inserts a row into the ORDER table, and then inserts an Order Created event into the EVENT table. The event publishing thread or process queries the EVENT table, requests unpublished events, publishes them, and then updates the EVENT table to mark this event as published.
 
-此方法也是优缺点都有。优点是可以确保事件发布不依赖于 2PC，应用发布业务层级事件而不需要推断他们发生了什么；而缺点在于此方法由于开发人员必须牢记发布事件，因此有可能出现错误。另外此方法对于某些使用 NoSQL 数据库的应用是个挑战，因为 NoSQL 本身交易和查询能力有限。
+This method also has advantages and disadvantages. The advantage is that you can ensure that event publication does not depend on 2PC, and applications publish business-level events without inferring what happened to them; the disadvantage is that this method has the potential for errors because developers must keep in mind publishing events. In addition, this method is a challenge for some applications using NoSQL databases, because NoSQL itself has limited transaction and query capabilities.
 
-此方法因为应用采用了本地交易更新状态和发布事件而不需要 2PC，现在再看看另外一种应用简单更新状态获得原子性的方法。
+This method does not require 2PC because the application uses local transactions to update the state and publish events. Now let's look at another method for simply updating the state of the application to obtain atomicity.
 
-## 1.3.2 挖掘数据库交易日志
+## 1.3.2 Mining database transaction logs
 
-另外一种不需要 2PC 而获得线程或者进程发布事件原子性的方式就是挖掘数据库交易或者提交日志。应用更新数据库，在数据库交易日志中产生变化，交易日志挖掘进程或者线程读这些交易日志，将日志发布给消息代理。如下图所见：
+Another way to obtain atomicity of thread or process publishing events without 2PC is to mine database transactions or commit logs. The application updates the database, making changes in the database transaction log, and the transaction log mining process or thread reads these transaction logs and publishes the logs to the message broker. As you can see in the picture below:
 
 ![No-2PC-required](./images/No-2PC-required.png)
 
-此方法的例子如 LinkedIn Databus 项目，Databus 挖掘 Oracle 交易日志，根据变化发布事件，LinkedIn 使用 Databus 来保证系统内各记录之间的一致性。
+Examples of this approach are the LinkedIn Databus project, where Databus mines Oracle transaction logs and publishes events based on changes, and LinkedIn uses Databus to ensure consistency across records within the system.
 
-另外的例子如：AWS 的 streams mechanism in AWS DynamoDB，是一个可管理的 NoSQL 数据库，一个 DynamoDB 流是由过去 24 小时对数据库表基于时序的变化（创建，更新和删除操作），应用可以从流中读取这些变化，然后以事件方式发布这些变化。
+Another example is: AWS's streams mechanism in AWS DynamoDB, which is a manageable NoSQL database. A DynamoDB stream is based on time-series changes (create, update, and delete operations) to database tables in the past 24 hours. Applications can learn from the stream Read those changes, then publish those changes as events.
 
-交易日志挖掘也是优缺点并存。优点是确保每次更新发布事件不依赖于 2PC。交易日志挖掘可以通过将发布事件和应用业务逻辑分离开得到简化；而主要缺点在于交易日志对不同数据库有不同格式，甚至不同数据库版本也有不同格式；而且很难从底层交易日志更新记录转换为高层业务事件。
+Transaction log mining also has advantages and disadvantages. The advantage is to ensure that every update release event does not depend on 2PC. Transaction log mining can be simplified by separating publishing events from application business logic; the main disadvantage is that transaction logs have different formats for different databases, and even different database versions; and it is difficult to convert from low-level transaction log update records to high-level business event.
 
-交易日志挖掘方法通过应用直接更新数据库而不需要 2PC 介入。下面我们再看一种完全不同的方法：不需要更新只依赖事件的方法。
+The transaction log mining method directly updates the database through the application without 2PC intervention. Let's look at a completely different approach: a method that does not need to be updated and only depends on events.
 
-## 1.3.3 使用事件源
+## 1.3.3 Using event sources
 
-Event sourcing （事件源）通过使用根本不同的事件中心方式来获得不需 2PC 的原子性，保证业务实体的一致性。 这种应用保存业务实体一系列状态改变事件，而不是存储实体现在的状态。应用可以通过重放事件来重建实体现在状态。只要业务实体发生变化，新事件就会添加到时间表中。因为保存事件是单一操作，因此肯定是原子性的。
+Event sourcing (event source) achieves atomicity without 2PC by using a fundamentally different event center approach to ensure the consistency of business entities. This kind of application saves a series of state change events of business entities, rather than storing the current state of entities. Applications can reconstruct the entity's current state by replaying events. Whenever a business entity changes, new events are added to the timetable. Because the save event is a single operation, it must be atomic.
 
-为了理解事件源工作方式，考虑事件实体作为一个例子。传统方式中，每个订单映射为 ORDER 表中一行，例如在 ORDER_LINE_ITEM 表中。但是对于事件源方式，订单服务以事件状态改变方式存储一个订单：创建的，已批准的，已发货的，取消的；每个事件包括足够数据来重建订单状态。
+To understand how event sourcing works, consider event entities as an example. Traditionally, each order is mapped to a row in an ORDER table, for example in the ORDER_LINE_ITEM table. But with the event sourcing approach, the order service stores an order in terms of event state changes: created, approved, shipped, canceled; each event includes enough data to reconstruct the order state.
 
 ![Event-sourcing](./images/Event-sourcing.png)
 
-事件是长期保存在事件数据库中，提供 API 添加和获取实体事件。事件存储跟之前描述的消息代理类似，提供 API 来订阅事件。事件存储将事件递送到所有感兴趣的订阅者，事件存储是事件驱动微服务架构的基干。
+Events are stored in the event database for a long time, and APIs are provided to add and obtain entity events. The event store is similar to the message broker described earlier, providing an API to subscribe to events. The event store delivers events to all interested subscribers, and the event store is the backbone of the event-driven microservice architecture.
 
-事件源方法有很多优点：解决了事件驱动架构关键问题，使得只要有状态变化就可以可靠地发布事件，也就解决了微服务架构中数据一致性问题。另外，因为是持久化事件而不是对象，也就避免了 object relational impedance mismatch problem。
+The event source method has many advantages: it solves the key problem of the event-driven architecture, so that events can be released reliably as long as there is a state change, and it also solves the data consistency problem in the microservice architecture. In addition, because it is a persistent event rather than an object, the object relational impedance mismatch problem is avoided.
 
-数据源方法提供了 100%可靠的业务实体变化监控日志，使得获取任何时点实体状态成为可能。另外，事件源方法可以使得业务逻辑可以由事件交换的松耦合业务实体构成。这些优势使得单体应用移植到微服务架构变的相对容易。
+The data source method provides 100% reliable business entity change monitoring logs, making it possible to obtain entity status at any point in time. In addition, the event sourcing approach enables business logic to be composed of loosely coupled business entities exchanging events. These advantages make it relatively easy to port a monolithic application to a microservices architecture.
 
-事件源方法也有不少缺点，因为采用不同或者不太熟悉的变成模式，使得重新学习不太容易；事件存储只支持主键查询业务实体，必须使用 Command Query Responsibility Segregation (CQRS) 来完成查询业务，因此，应用必须处理最终一致数据。
+The event source method also has many shortcomings, because it adopts different or unfamiliar transformation modes, which makes it difficult to relearn; event storage only supports primary key query business entities, and Command Query Responsibility Segregation (CQRS) must be used to complete the query business. Therefore, applications must deal with eventually consistent data.
 
-# 1.4 总结
+# 1.4 Summarize
 
-在微服务架构中，每个微服务都有自己私有的数据集。不同微服务可能使用不同的 SQL 或者 NoSQL 数据库。尽管数据库架构有很强的优势，但是也面对数据分布式管理的挑战。第一个挑战就是如何在多服务之间维护业务交易一致性；第二个挑战是如何从多服务环境中获取一致性数据。
+In a microservice architecture, each microservice has its own private dataset. Different microservices may use different SQL or NoSQL databases. Although the database architecture has strong advantages, it also faces the challenge of distributed data management. The first challenge is how to maintain business transaction consistency between multiple services; the second challenge is how to obtain consistent data from a multi-service environment.
 
-最佳解决办法是采用事件驱动架构。其中碰到的一个挑战是如何原子性的更新状态和发布事件。有几种方法可以解决此问题，包括将数据库视为消息队列、交易日志挖掘和事件源。
+The best solution is to use an event-driven architecture. One of the challenges encountered is how to atomically update state and publish events. There are several approaches to this problem, including treating the database as a message queue, transaction log mining, and event sourcing.
